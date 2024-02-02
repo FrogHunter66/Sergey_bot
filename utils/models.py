@@ -42,8 +42,8 @@ class Questions(BaseModel):
     id_quest = db.Column(db.BigInteger, primary_key=True, nullable=False)
     id_test = db.Column(db.BigInteger)
     type = db.Column(db.BigInteger)
-    variants = db.Column(db.ARRAY(db.String))
-    correct_answer = db.Column(db.ARRAY(db.String))
+    variants = db.Column(db.String)
+    correct_answer = db.Column(db.String)
 
 
 class User(BaseModel):

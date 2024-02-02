@@ -5,6 +5,7 @@ from aiogram.types import Message, InlineKeyboardButton
 from aiogram import types
 from aiogram.filters import Command
 
+from keyboard.ikb_actions_question import ikb_actions_qustion
 from keyboard.ikb_all_events import ikb_all_events
 from keyboard.ikb_current_test import ikb_current_test
 from keyboard.ikb_types_questions import ikb_types_of_questions
@@ -14,7 +15,7 @@ from filters.is_admin import Admin
 from keyboard.list_questions import ikb_all_questions
 from utils.db_api.quck_commands import event
 from aiogram.fsm.context import FSMContext
-from states.fsm import Current
+from states.fsm import Current, Current2
 from aiogram.fsm.state import StatesGroup, State
 router = Router()
 #todo Прописать все бэки
@@ -65,3 +66,116 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     name = data.get("event")
     await callback.message.answer(f"Выберите действие для мероприятия '{name}'", reply_markup=ikb_current_test())
 
+
+@router.callback_query(F.data == "ikb_back", Current2.correct)
+async def second(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    text = data.get("text")
+    variants = data.get("variants")
+    correct = data.get("correct")
+    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
+    Предпросмотр вопроса - 
+    Текст вопроса:
+    {text if text else "Пока не заполненно"}
+    ------------------------------------------------------
+    Варианты ответа:
+    {variants if variants else "Пока не заполненно"}
+    ------------------------------------------------------
+    Правильные ответы:
+    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await state.set_state(Current2.event)
+
+
+@router.callback_query(F.data == "ikb_back", Current2.question)
+async def second(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    text = data.get("text")
+    variants = data.get("variants")
+    correct = data.get("correct")
+    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
+    Предпросмотр вопроса - 
+    Текст вопроса:
+    {text if text else "Пока не заполненно"}
+    ------------------------------------------------------
+    Варианты ответа:
+    {variants if variants else "Пока не заполненно"}
+    ------------------------------------------------------
+    Правильные ответы:
+    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await state.set_state(Current2.event)
+
+
+@router.callback_query(F.data == "ikb_back", Current2.variants)
+async def second(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    text = data.get("text")
+    variants = data.get("variants")
+    correct = data.get("correct")
+    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
+    Предпросмотр вопроса - 
+    Текст вопроса:
+    {text if text else "Пока не заполненно"}
+    ------------------------------------------------------
+    Варианты ответа:
+    {variants if variants else "Пока не заполненно"}
+    ------------------------------------------------------
+    Правильные ответы:
+    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await state.set_state(Current2.event)
+
+
+@router.callback_query(F.data == "ikb_back", Current.correct)
+async def second(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    text = data.get("text")
+    variants = data.get("variants")
+    correct = data.get("correct")
+    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
+    Предпросмотр вопроса - 
+    Текст вопроса:
+    {text if text else "Пока не заполненно"}
+    ------------------------------------------------------
+    Варианты ответа:
+    {variants if variants else "Пока не заполненно"}
+    ------------------------------------------------------
+    Правильные ответы:
+    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await state.set_state(Current.event)
+
+
+@router.callback_query(F.data == "ikb_back", Current.question)
+async def second(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    text = data.get("text")
+    variants = data.get("variants")
+    correct = data.get("correct")
+    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
+    Предпросмотр вопроса - 
+    Текст вопроса:
+    {text if text else "Пока не заполненно"}
+    ------------------------------------------------------
+    Варианты ответа:
+    {variants if variants else "Пока не заполненно"}
+    ------------------------------------------------------
+    Правильные ответы:
+    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await state.set_state(Current.event)
+
+
+@router.callback_query(F.data == "ikb_back", Current.variants)
+async def second(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    text = data.get("text")
+    variants = data.get("variants")
+    correct = data.get("correct")
+    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
+    Предпросмотр вопроса - 
+    Текст вопроса:
+    {text if text else "Пока не заполненно"}
+    ------------------------------------------------------
+    Варианты ответа:
+    {variants if variants else "Пока не заполненно"}
+    ------------------------------------------------------
+    Правильные ответы:
+    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await state.set_state(Current.event)

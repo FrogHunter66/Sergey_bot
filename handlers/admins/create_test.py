@@ -166,7 +166,8 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
 @router.callback_query(Current.event, F.data == "create_question")
 async def add_test2(query: CallbackQuery, state: FSMContext):
     await query.message.answer("""Выберите тип вопроса:
-    1 тип - вопрос с единственным правильным ответом""", reply_markup=ikb_types_of_questions())
+    1 тип - вопрос с единственным правильным ответом
+    2 тип - вопрос с множественными правильными ответами""", reply_markup=ikb_types_of_questions())
 
 
 #todo Проверить работоспособность опроса из составленных вопросов

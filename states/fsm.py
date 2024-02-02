@@ -27,3 +27,20 @@ class Current(StatesGroup):
     correct = State()
     volume_vars = State()
     num_of_correct = State()
+
+
+class Current2(StatesGroup):
+    event = State()
+    current_test = State()
+
+    event_id = State()
+    setting_code = State()
+    setting_passing = State()
+    setting_time = State()
+
+    type = State()
+    question = State()
+    variants = State()
+    correct = State()
+    volume_vars = State()
+    num_of_correct = State()
