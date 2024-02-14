@@ -30,10 +30,11 @@ class Event(BaseModel):
 
 class Test(BaseModel):
     __tablename__ = 'test'
-    id_event = db.Column(db.BigInteger, primary_key=True, nullable=False)
-    id_test = db.Column(db.BigInteger)
+    id_test = db.Column(db.BigInteger, primary_key=True, nullable=False)
+    id_event = db.Column(db.BigInteger)
     token = db.Column(db.BigInteger)
-    lifetime = db.Column(db.BigInteger)
+    lifetime = db.Column(db.String)
+    end_time = db.Column(db.DateTime(timezone=True))
     bound_time = db.Column(db.BigInteger)
 
 
@@ -43,6 +44,7 @@ class Questions(BaseModel):
     id_test = db.Column(db.BigInteger)
     type = db.Column(db.BigInteger)
     variants = db.Column(db.String)
+    text = db.Column(db.String)
     correct_answer = db.Column(db.String)
 
 

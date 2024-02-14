@@ -3,7 +3,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from handlers import group_game
-from handlers.admins import create_event, utils, create_test, first, commands_for_tests, second
+from handlers.admins import create_event, utils, create_test, first, commands_for_tests, second, reuild_question
+from handlers.admins.users import register, passing_test
 from config import TELEGRAM_TOKEN
 import logging
 
@@ -18,7 +19,7 @@ async def main():
         storage = MemoryStorage()
         bot = Bot(token=TELEGRAM_TOKEN)
         dp = Dispatcher(storage=storage)
-        dp.include_routers(create_event.router, utils.router, create_test.router, first.router, commands_for_tests.router, second.router)
+        dp.include_routers(create_event.router, utils.router, create_test.router, first.router, commands_for_tests.router, second.router, reuild_question.router, register.router, passing_test.router)
 
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot)

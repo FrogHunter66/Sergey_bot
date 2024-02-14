@@ -15,16 +15,28 @@ class Creation(StatesGroup):
 class Current(StatesGroup):
     event = State()
     current_test = State()
+    current_quest = State()
 
     event_id = State()
     setting_code = State()
     setting_passing = State()
     setting_time = State()
 
+    setting_code2 = State()
+    setting_passing2 = State()
+    setting_time2 = State()
+
+    rebuild_quest = State()
     type = State()
     question = State()
     variants = State()
     correct = State()
+
+    rebuild_type = State()
+    rebuild_question = State()
+    rebuild_variants = State()
+    rebuild_correct = State()
+
     volume_vars = State()
     num_of_correct = State()
 
@@ -44,3 +56,20 @@ class Current2(StatesGroup):
     correct = State()
     volume_vars = State()
     num_of_correct = State()
+
+class User(StatesGroup):
+    id = State()
+    username = State()
+    first_name = State()
+    last_name = State()
+    test_code = State()
+
+    answer = State()
+    current_test = State()
+    current_quest = State()
+    choose_quest = State()
+    time = State()
+
+
+    multiple_res = State()
+    result = State()

@@ -45,14 +45,14 @@ async def name_event(message: Message, state: FSMContext):
 @router.callback_query(Creation.name_event, F.data == "ikb_save_event")
 async def second(callback: types.CallbackQuery, state:FSMContext):
     events_len =len(await event.get_all_events())
-    print("handled")
     data = await state.get_data()
+    print("data")
     try:
         await event.add_event(id_event=events_len+1, name=str(data.get('name_event')))
         await state.clear()
-        await callback.message.answer("Удачно добавлено мероприятие", ikb_back())
+        await callback.message.answer("Удачно добавлено мероприятие", reply_markup=ikb_back())
     except Exception as err:
-        await callback.message.answer("Ошибка сохранения", ikb_back())
+        await callback.message.answer("Ошибка сохранения", reply_markup=ikb_back())
         await state.clear()
         print(err)
 

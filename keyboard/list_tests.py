@@ -5,7 +5,12 @@ from utils.db_api.quck_commands import tests
 from aiogram.filters.callback_data import CallbackData
 
 
+
 class Choose_test(CallbackData, prefix="my"):
+    cb: str
+    id: int
+
+class Choose_timeer(CallbackData, prefix="my"):
     cb: str
     id: int
 

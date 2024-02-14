@@ -5,6 +5,7 @@ from aiogram.types import Message, InlineKeyboardButton, CallbackQuery
 from aiogram import types
 from aiogram.filters import Command
 from filters.is_admin import Admin
+from keyboard.list_questions import ikb_all_questions
 from utils.db_api.quck_commands import event, tests, questions
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -67,14 +68,12 @@ async def second(query: CallbackQuery, state: FSMContext):
 async def second(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     variants = data.get("variants")
-
     if variants:
         lst_vars = list(map(str, variants.split(".*.")))
         response = "Варианты ответа: \n" + "\n".join(lst_vars)
         await query.message.answer(response)
     else:
         await query.message.answer("Вы пока не ввели правильный вариант ответа")
-
     await query.message.answer("Выберите ответ, который будет считаться правильным", reply_markup=ikb_back())
     await state.set_state(Current.correct)
 
@@ -114,9 +113,10 @@ async def question(message: Message, state:FSMContext):
     data_new = await state.get_data()
     variants = data_new.get("variants")
     list_variants = list(map(str, variants.split(".*.")))
-    text = data_new.get("text")
+    text = data_new.get("question")
     correct = data_new.get("correct")
-    await message.answer(f"""Предпросмотр вопроса - 
+    await message.answer(f"""Вы в конструкторе вопроса с единственным выбором правильного ответа
+Предпросмотр вопроса - 
 Текст вопроса:
 {text if text else "Пока не заполненно"}
 ------------------------------------------------------
@@ -141,7 +141,9 @@ async def question(message: Message, state:FSMContext):
             if text > 0 and text <= len(vars):
                 await state.update_data(correct=vars[text-1])
                 await message.answer(f"Успешно установлен вариант ответа {text}: {vars[text-1]}")
-                await message.answer(f"""Предпросмотр вопроса -
+                await message.answer(f"""Вы в конструкторе вопроса с единственным выбором правильного ответа
+
+Предпросмотр вопроса -
 Текст вопроса:
 {qest if qest else "Пока не заполненно"}
 ------------------------------------------------------
@@ -153,7 +155,6 @@ async def question(message: Message, state:FSMContext):
                 await state.set_state(Current.event)
             else:
                 await message.answer(f"Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back()) #todo прописать бэк для Current.corect
-
         else:
             await message.answer("Ваианты еще не заполнены. Сперва заполните варианты ответа", ikb_actions_qustion())
             await state.set_state(Current.event)
@@ -172,10 +173,21 @@ async def second(query: CallbackQuery, state: FSMContext):
     all_quests = await questions.get_all_quest()
     if quest and vars and correct:
         try:
-            await questions.add_test(id_test=test_id, id_quest=len(all_quests), correct_answer=correct, type=types, variants=vars)
+            await questions.add_test(id_test=test_id, id_quest=len(all_quests)+1, correct_answer=correct, quest_type=types, variants=vars, text=quest)
             await query.message.answer("Вопрос успешно добавлен")
+            kb = await ikb_all_questions(test_id)
+            await query.message.answer("Выберите действие для вопросов", reply_markup=kb)
+            await state.update_data(question='')
+            await state.update_data(variants='')
+            await state.update_data(correct='')
+            await state.update_data(type='')
+            await state.set_state(Current.current_test)
         except:
             await query.message.answer("Произошла ошибка")
-    await state.set_state(Current.variants)
-
-#todo Тест всего что сейчас имеется, прописать бэки и 2 тип заданий сделать (01.02.24)
+            kb = await ikb_all_questions(test_id)
+            await query.message.answer("Выберите действие для вопросов", reply_markup=kb)
+    else:
+        await query.message.answer(f"""Вы не заполнили одно из полей:
+Текст вопроса - {quest if quest else "Не заполненно"}
+Варианты ответа - {quest if quest else "Не заполнены"}
+Правильный вариант ответа - {quest if quest else "Не заполнен"}""",  reply_markup=ikb_actions_qustion())

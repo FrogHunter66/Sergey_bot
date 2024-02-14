@@ -5,6 +5,7 @@ from aiogram.types import Message, InlineKeyboardButton, CallbackQuery
 from aiogram import types
 from aiogram.filters import Command
 from filters.is_admin import Admin
+from keyboard.list_questions import ikb_all_questions
 from utils.db_api.quck_commands import event, tests, questions
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -43,6 +44,7 @@ async def second(query: CallbackQuery, state: FSMContext):
 {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
     await state.set_state(Current2.event)
 
+#todo Изменение у существующих тестов их код доступа таймг и тд
 
 
 @router.callback_query(Current2.event, F.data =="ikb_text_quest")
@@ -80,7 +82,9 @@ async def question(message: Message, state:FSMContext):
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
-    await message.answer(f"""Предпросмотр вопроса - 
+    await message.answer(f"""Вы в конструкторе вопроса с множественным выбором правильного ответа
+
+Предпросмотр вопроса - 
 Текст вопроса:
 {text if text else "Пока не заполненно"}
 ------------------------------------------------------
@@ -106,9 +110,11 @@ async def question(message: Message, state:FSMContext):
     data_new = await state.get_data()
     variants = data_new.get("variants")
     list_variants = list(map(str, variants.split(".*.")))
-    text = data_new.get("text")
+    text = data_new.get("question")
     correct = data_new.get("correct")
-    await message.answer(f"""Предпросмотр вопроса - 
+    await message.answer(f"""Вы в конструкторе вопроса с множественным выбором правильного ответа
+
+Предпросмотр вопроса - 
 Текст вопроса:
 {text if text else "Пока не заполненно"}
 ------------------------------------------------------
@@ -142,9 +148,10 @@ async def question(message: Message, state:FSMContext):
                 data_new = await state.get_data()
                 variants = data_new.get("correct")
                 list_corrects = list(map(str, variants.split(".*.")))
-                print(list_corrects)
 
-                await message.answer(f"""Предпросмотр вопроса -
+                await message.answer(f"""Вы в конструкторе вопроса с множественным выбором правильного ответа
+                
+Предпросмотр вопроса -
 Текст вопроса:
 {qest if qest else "Пока не заполненно"}
 ------------------------------------------------------
@@ -172,12 +179,26 @@ async def second(query: CallbackQuery, state: FSMContext):
     correct = data.get("correct")
     test_id = data.get("current_test")
     types = data.get("type")
+    print(quest)
+    print(vars)
+    print(correct)
     all_quests = await questions.get_all_quest()
     if quest and vars and correct:
         try:
-            await questions.add_test(id_test=test_id, id_quest=len(all_quests)+1, correct_answer=correct, type=types, variants=vars)
+            await questions.add_test(id_test=test_id, id_quest=len(all_quests)+1, correct_answer=correct, quest_type=types, variants=vars, text=quest)
             await query.message.answer("Вопрос успешно добавлен")
+            kb = await ikb_all_questions(test_id)
+            await query.message.answer("Выберите действие для вопросов", reply_markup=kb)
+            await state.update_data(question='')
+            await state.update_data(variants='')
+            await state.update_data(correct='')
+            await state.update_data(type='')
         except Exception as err:
             await query.message.answer("Произошла ошибка")
-            print(err)
-    await state.set_state(Current2.variants)
+            kb = await ikb_all_questions(test_id)
+            await query.message.answer("Выберите действие для вопросов", reply_markup=kb)
+    else:
+        await query.message.answer(f"""Вы не заполнили одно из полей:
+Текст вопроса - {quest if quest else "Не заполненно"}
+Варианты ответа - {quest if quest else "Не заполнены"}
+Правильный вариант ответа - {quest if quest else "Не заполнен"}""", reply_markup=ikb_actions_qustion())

@@ -16,7 +16,7 @@ from states.fsm import Creation, Current
 from keyboard.ikb_all_events import ikb_all_events, Choose_event
 from keyboard.ikb_current_test import ikb_current_test
 from keyboard.ikb_settings_test import ikb_settings_test
-from keyboard.ikb_timer import ikb_timer
+from keyboard.ikb_timer import ikb_timer, Choose_timeer
 from keyboard.ikb_adding_questions import ikb_adding_questions
 from keyboard.ikb_types_questions import ikb_types_of_questions
 from keyboard.list_tests import ikb_all_tests
@@ -41,7 +41,6 @@ async def second(query: CallbackQuery, callback_data: Choose_event, state: FSMCo
     await state.update_data(event=name)
 
 
-#todo Начать реализацию типов теста, придумать чето с настройками теста
 
 @router.callback_query(Current.event, F.data == "create_test")
 async def add_test(query: CallbackQuery, state: FSMContext):
@@ -103,13 +102,34 @@ async def add_test3(message: Message, state: FSMContext):
     code = message.text
     try:
         code = int(code)
-        await state.update_data(setting_code=code)
-        await state.set_state(Current.event)
-        await message.answer(f"Код для доступа успешно установлен [{code}]")
-        await message.answer("""
-1) Код доступа по которому пользователи смогут получить доступ к тесту
-2) Время на прохождение теста
+        if code > 0:
+            is_unique = True
+            data_tests = await tests.get_all_tests()
+            for test in data_tests:
+                if test.token == code:
+                    is_unique = False
+                    break
+            if is_unique:
+                code = int(code)
+                await state.update_data(setting_code=code)
+                await message.answer(f"Время на прохождение теста успешно установлено [{code}]")
+                await message.answer("""1) Код доступа по которому пользователи смогут получить доступ к тесту 
+2) Время на прохождение теста 
 3) Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
+
+            else:
+                await message.answer("Данный код доступа уже используется в другом тесте. Придумайте другой код")
+                await message.answer("""1) Код доступа по которому пользователи смогут получить доступ к тесту 
+2) Время на прохождение теста 
+3) Время через которое тест перестанет быть действительным""",
+                                     reply_markup=ikb_settings_test())
+        else:
+            await message.answer("Время должно быть натуральным числом")
+            await message.answer("""
+        1) Код доступа по которому пользователи смогут получить доступ к тесту 
+        2) Время на прохождение теста 
+        3) Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
+        await state.set_state(Current.event)
     except:
         await state.set_state(Current.event)
         await message.answer("Код может быть только численнного формата")
@@ -118,13 +138,12 @@ async def add_test3(message: Message, state: FSMContext):
 2) Время на прохождение теста 
 3) Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
 
-#todo Для всех времен сделать
 
+@router.callback_query(Current.setting_time, Choose_timeer.filter(F.cb=="ikb_time"))
+async def add_test2(query: CallbackQuery, state: FSMContext, callback_data: Choose_timeer):
+    await state.update_data(setting_time=callback_data.id)
 
-@router.callback_query(Current.setting_time, F.data == "ikb_time_15m")
-async def add_test2(query: CallbackQuery, state: FSMContext):
-    await state.update_data(setting_time=15)
-    await query.message.answer("Время существования теста успешно установленно [15 минут]")
+    await query.message.answer(f"Время существования теста успешно установленно [{callback_data.id}]")
     await query.message.answer("""
 1) Код доступа по которому пользователи смогут получить доступ к тесту 
 2) Время на прохождение теста 
@@ -136,23 +155,28 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
 async def add_test2(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     id = data.get("event_id")
-    print(id)
     code = data.get("setting_code")
     passing = data.get("setting_passing")
     time = data.get("setting_time")
-    print(time, code, passing)
-
     if code and passing and time:
         try:
             all_test = await tests.get_all_tests()
-
             await tests.add_test(id_event=id, setting_code=code, setting_time=time, setting_passing=passing, id_test=len(all_test)+1)
             await query.message.answer("Можете приступить к заполнению вопросами", reply_markup=ikb_adding_questions())
+            await state.update_data(setting_code="")
+            await state.update_data(setting_passing="")
+            await state.update_data(setting_time="")
         except Exception as err:
             await query.message.answer("При создании опроса возникла ошибка", reply_markup=ikb_back())
             print(err)
     else:
-        print('err')
+        await query.message.answer(f"""Код доступа - {code if code else "Не заполненно"}
+Время на прохождение теста - {time if time else "Не выбрано"}
+Время существования теста - {passing if passing else "Не выбрано"}
+Пожалуйста, заполните недостающие настройки теста
+1) Код доступа по которому пользователи смогут получить доступ к тесту 
+2) Время на прохождение теста 
+3) Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
         # if (not code) and passing and time:
         #     await query.message.answer("Вы не указали код доступа", ikb_settings_test())
         # if code and (not passing) and time:
@@ -166,20 +190,18 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
 @router.callback_query(Current.event, F.data == "create_question")
 async def add_test2(query: CallbackQuery, state: FSMContext):
     await query.message.answer("""Выберите тип вопроса:
-    1 тип - вопрос с единственным правильным ответом
-    2 тип - вопрос с множественными правильными ответами""", reply_markup=ikb_types_of_questions())
+1 тип - вопрос с единственным правильным ответом
+2 тип - вопрос с множественными правильными ответами""", reply_markup=ikb_types_of_questions())
 
 
-#todo Проверить работоспособность опроса из составленных вопросов
 @router.callback_query(Current.event, F.data == "list_tests")
 async def add_test2(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     id = data.get("event_id")
+    print("id ", id)
     if id:
         kb = await ikb_all_tests(id)
         await query.message.answer("Список опросов", reply_markup=kb)
     else:
-        await query.message.answer("Список опросов", reply_markup=ikb_back()) #todo Бэк
-
-
+        await query.message.answer("Список опросов", reply_markup=ikb_back())
 
