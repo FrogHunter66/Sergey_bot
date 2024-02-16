@@ -70,6 +70,5 @@ class User(StatesGroup):
     choose_quest = State()
     time = State()
 
-
-    multiple_res = State()
+    final_res = State()
     result = State()

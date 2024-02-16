@@ -90,7 +90,6 @@ async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: Tak
         await query.message.answer("Время на выполнение теста вышло")
         await state.clear()
 
-#todo слишком примитивно
 @router.callback_query(answer.filter(F.cb=="ikb_answer"), User.answer, Old_user())
 async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: answer):
     current_ans = callback_data.id
@@ -101,52 +100,86 @@ async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: ans
     result = data.get("result")
     type_quest = current_quest.type
     if type_quest == 1:
-        correct = current_quest.correct_answer
-        if correct == variants[current_ans]:
-            if result:
-                result += '+'
-                await state.update_data(result=result)
-            else:
-                await state.update_data(result="+")
+        await state.update_data(result=current_ans)
+
+    elif type_quest == 2:
+        if result:
+            result += current_ans
+            await state.update_data(result=result)
         else:
-            if result:
-                result += '-'
-                await state.update_data(result=result)
-            else:
-                await state.update_data(result="-")
+            await state.update_data(result=current_ans)
 
-
-    if type_quest == 2:
-
-        correct = list(map(str, current_quest.correct_answer.split(".*.")))
-        if variants[current_ans] in correct:
-            if result:
-                result += '+'
-                await state.update_data(result=result)
-            else:
-                await state.update_data(result="+")
-        else:
-            if result:
-                result += '-'
-                await state.update_data(result=result)
-            else:
-                await state.update_data(result="-")
+    else:
+        await query.message.answer("Так не бывает")
 
 
 @router.callback_query(User.answer, F.data=="ikb_save_answer", Old_user())
 async def save(query: CallbackQuery, state: FSMContext):
     await state.set_state(User.choose_quest)
     data = await state.get_data()
+    res = data.get("result")
+    id_quest = data.get("id_quest")
+    final = data.get("final_res")
+    if res:
+        if final:
+            ans_final = f"{id_quest}-{res},{final}"
+            await state.update_data(final_res=ans_final)
+        else:
+            ans_final = f"{id_quest}-{res}"
+            await state.update_data(final_res=ans_final)
+    else:
+        if final:
+            ans_final = f"{id_quest}-0,{final}"
+            await state.update_data(final_res=ans_final)
+        else:
+            ans_final = f"{id_quest}-0"
+            await state.update_data(final_res=ans_final)
+
+    data_new = await state.get_data()
+    print(data_new.get("final_res"))
+
     id_test = data.get("current_test")
     kb = await ikb_get_all_quests(id_test)
-    await query.message.answer(f"Выберите вопрос", reply_markup=kb)
+    end_time_not_serialized = data.get("time")
+    end_time = deserialize_datetime(end_time_not_serialized)
+    current_time = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
+    if end_time > current_time:
+        differ = (end_time - current_time).replace(microsecond=0)
+        await query.message.answer(f"Выберите вопрос, время до окончания тестировани - {differ}", reply_markup=kb)
+
+
+def get_result(state, all_quests):
+    final = list(map(str, state.split(",")))
+    # Инициализация пустого словаря
+    final_set = {}
+
+    # Обработка каждого элемента списка
+    for element in final:
+        # Разделение элемента по тире
+        parts = element.split('-')
+
+        # Извлечение ключа и значения
+        key = int(parts[0])
+        val = parts[1].strip()
+
+        # Добавление в словарь
+        final_set[key] = val
+#todo разница во множественных и единственных ответах от юзера
+    for quest in all_quests:
+        if final_set[quest.id_quest]:
+            corrects = list(map(str, quest.correct_answer.split(".*.")))
+            variants = list(map(str, quest.variants.split(".*.")))
+            flag = True
+            for correct in corrects:
+                if variants[]
 
 
 @router.callback_query(User.choose_quest, F.data=="ikb_finish", Old_user())
 async def save(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    res = data.get("result")
-    minuses = res.count("-")
-    pluses = res.count("+")
+    final_state = data.get("final_res")
+    id_test = data.get("current_test")
+    all_quests = await questions.get_questions(id_test)
+
     await query.message.answer(f"Ваш результат - {pluses-1} правильных ответов, {minuses} - неправильных ответов")
     await state.clear()
