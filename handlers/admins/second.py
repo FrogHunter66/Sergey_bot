@@ -44,8 +44,6 @@ async def second(query: CallbackQuery, state: FSMContext):
 {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
     await state.set_state(Current2.event)
 
-#todo Изменение у существующих тестов их код доступа таймг и тд
-
 
 @router.callback_query(Current2.event, F.data =="ikb_text_quest")
 async def second(query: CallbackQuery, state: FSMContext):
@@ -193,6 +191,7 @@ async def second(query: CallbackQuery, state: FSMContext):
             await state.update_data(variants='')
             await state.update_data(correct='')
             await state.update_data(type='')
+            await state.set_state(Current.current_test)
         except Exception as err:
             await query.message.answer("Произошла ошибка")
             kb = await ikb_all_questions(test_id)

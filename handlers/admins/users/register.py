@@ -72,8 +72,6 @@ async def first(message: Message, state: FSMContext):
 
 @router.message(User.test_code, Old_user())
 async def start_test(message: Message, state: FSMContext):
-    time1 = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
-
     data = await state.get_data()
     code = message.text
     all_tests = await tests.get_all_tests()
@@ -89,14 +87,14 @@ async def start_test(message: Message, state: FSMContext):
         current_test = await tests.get_current(1, id_test=id_test)
         count_quests = await questions.get_questions(id_test)
         current_time = datetime.datetime.utcnow()
-        current_time = current_time.replace(tzinfo=datetime.timezone.utc, microsecond=0)#todo всеравно какого то хуя есть микросекнды
+        current_time = current_time.replace(tzinfo=datetime.timezone.utc, microsecond=0)
         end_time = current_test.end_time.replace(microsecond=0)
         differ = end_time - current_time
         if current_time < end_time:
             await message.answer(f"""Готовы ли вы приступить к началу тестирования 
-        (Тут будет высвечиваться время на прохождение)
-        Время до конца существования теста - {differ}
-        Количество вопросов - {len(count_quests)}""", reply_markup=ikb_start_test())
+Время на прохождение теста ограниченно {current_test.lifetime}
+Время до конца существования теста - {differ}
+Количество вопросов - {len(count_quests)}""", reply_markup=ikb_start_test())
         else:
             await message.answer(f"Тест больше не доступен. Время существования теста истекло")
     else:

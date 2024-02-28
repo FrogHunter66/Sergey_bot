@@ -51,6 +51,18 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
 2 тип - вопрос с множественными правильными ответами""", reply_markup=ikb_types_of_questions())
 
 
+@router.callback_query(F.data == "ikb_back_choose_type", Current2.event)
+async def second(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer("""Выберите тип вопроса:
+1 тип - вопрос с единственным правильным ответом
+2 тип - вопрос с множественными правильными ответами""", reply_markup=ikb_types_of_questions())
+    await state.update_data(text=None)
+    await state.update_data(variants=None)
+    await state.update_data(correct=None)
+    await state.update_data(type=None)
+    await state.set_state(Current.event)
+
+
 
 @router.callback_query(F.data == "ikb_back_choose_questionnn", Current.event)
 async def second(callback: types.CallbackQuery, state: FSMContext):
@@ -59,7 +71,19 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     id = data.get("current_test")
     kb = await ikb_all_questions(id)
     await callback.message.answer("Выберите действие", reply_markup=kb)
-    print("3")
+
+
+@router.callback_query(F.data == "ikb_back_choose_type", Current.rebuild_quest)
+async def second(callback: types.CallbackQuery, state: FSMContext):
+    await state.set_state(Current.current_test)
+    data = await state.get_data()
+    id = data.get("current_test")
+    kb = await ikb_all_questions(id)
+    await callback.message.answer("Выберите действие", reply_markup=kb)
+    await state.update_data(text=None)
+    await state.update_data(variants=None)
+    await state.update_data(correct=None)
+    await state.update_data(type=None)
 
 
 @router.callback_query(F.data == "ikb_back_tochoose_opros", Current.event)

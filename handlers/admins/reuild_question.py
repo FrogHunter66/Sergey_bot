@@ -190,4 +190,3 @@ async def question(message: Message, state:FSMContext):
         await message.answer(f"Выберите вариант ответа от 1 до {len(variants)}", reply_markup=ikb_back())
 
 
-#todo Позоду только время осталось прописать и сторону пользователя быренько наклепать да и все :) 9.02

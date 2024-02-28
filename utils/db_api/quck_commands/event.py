@@ -21,4 +21,7 @@ async def select_event(event_id):
     event = await Event.query.where(Event.id_event == event_id).gino.first()
     return event
 
+async def delete_event(event_id):
+    info = await Event.query.where(Event.id_event == event_id).gino.first()
+    await info.delete()
 

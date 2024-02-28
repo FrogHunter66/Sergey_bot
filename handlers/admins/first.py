@@ -161,6 +161,13 @@ async def question(message: Message, state:FSMContext):
     except:
         await message.answer(f"Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back())
 
+async def get_unique_value(values):
+    for i in range(10000):
+        if i not in values:
+            return i
+
+    return None
+
 
 @router.callback_query(Current.event, F.data =="ikb_add_question_test")
 async def second(query: CallbackQuery, state: FSMContext):
@@ -170,7 +177,12 @@ async def second(query: CallbackQuery, state: FSMContext):
     correct = data.get("correct")
     test_id = data.get("current_test")
     types = data.get("type")
+
     all_quests = await questions.get_all_quest()
+    print(test_id)
+    print(all_quests)
+    print(correct)
+    print(types)
     if quest and vars and correct:
         try:
             await questions.add_test(id_test=test_id, id_quest=len(all_quests)+1, correct_answer=correct, quest_type=types, variants=vars, text=quest)

@@ -11,16 +11,32 @@ class answer(CallbackData, prefix="my"):
 
 
 
-async def ikb_pass_test(id_quest):
+async def ikb_pass_test(id_quest, mark):
     events = await questions.get_current(id_quest)
     all_variants = events.variants
     variants = list(map(str, all_variants.split(".*.")))
+#todo сделать каждую кнопку с новой строки
     lst = list()
     for i, var in enumerate(variants):
-        cb = answer(cb="ikb_answer", id=i).pack()
-        btn1 = InlineKeyboardButton(text=f"{i+1} - й ответ",
-                                    callback_data=cb)
-        lst.append(btn1)
+        cb = answer(cb="ikb_answer", id=i + 1).pack()
+        if mark:
+            lst_mark = [m for m in mark]
+            print(lst_mark)
+            if str(i+1) in lst_mark:
+                btn1 = InlineKeyboardButton(text=f"{i + 1}-й ответ ✔",
+                                            callback_data=cb)
+                lst.append(btn1)
+            else:
+                btn1 = InlineKeyboardButton(text=f"{i + 1}-й ответ",
+                                            callback_data=cb)
+                lst.append(btn1)
+
+        else:
+            btn1 = InlineKeyboardButton(text=f"{i+1}-й ответ",
+                                        callback_data=cb)
+            lst.append(btn1)
     btn3 = (InlineKeyboardButton(text="Сохранить ответ", callback_data=f"ikb_save_answer"))
-    builder = InlineKeyboardMarkup(inline_keyboard=[lst, [btn3]])
+    ss = [[m] for m in lst]
+    ss.append([btn3])
+    builder = InlineKeyboardMarkup(inline_keyboard=ss)
     return builder

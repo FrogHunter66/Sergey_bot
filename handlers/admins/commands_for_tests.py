@@ -232,21 +232,28 @@ async def second(query: CallbackQuery, state: FSMContext):
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
+    id_quest = data.get("current_quest")
     id_test = data.get("current_test")
+    print("Интересное значение", id_test)
     typee = data.get("type")
     try:
-        await questions.change_correct(id_quest=id_test, new_correct=correct)
-        await questions.change_text(id_quest=id_test, new_text=text)
-        await questions.change_vars(id_quest=id_test, new_vars=variants)
+        await questions.change_correct(id_quest=id_quest, new_correct=correct)
+        await questions.change_text(id_quest=id_quest, new_text=text)
+        await questions.change_vars(id_quest=id_quest, new_vars=variants)
         await query.message.answer("Данные успешно сохранены")
         kb = await ikb_all_questions(id_test)
         await query.message.answer("Выберите действие", reply_markup=kb)
         await state.set_state(Current.current_test)
+        await state.update_data(text=None)
+        await state.update_data(variants=None)
+        await state.update_data(correct=None)
+        await state.update_data(type=None)
     except Exception as err:
         await state.set_state(Current.current_test)
+        print("err in 251 line commands for test", err)
         await query.message.answer("Произошла ошибка")
         await query.message.answer(
-f"""Вы в редакторе вопроса {id_test} с выбором {" единственного правильно ответа" if typee == 1 else " множественного правильного ответа "}, выберите что бы вы хотели изменить:
+f"""Вы в редакторе вопроса {id_quest} с выбором {" единственного правильно ответа" if typee == 1 else " множественного правильного ответа "}, выберите что бы вы хотели изменить:
 Текст вопроса -
 {text if text else "Не заполненно"}
 

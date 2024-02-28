@@ -41,22 +41,27 @@ async def name_event(message: Message, state: FSMContext):
     await state.update_data(name_event=name)
     await message.answer(f"Сохранить мероприятие с названием '{name}' ?", reply_markup=ikb_save())
 
+async def get_unique_key(keys):
+    for i in range(1000):
+        if i not in keys:
+            return i
+    else: return None
 
 @router.callback_query(Creation.name_event, F.data == "ikb_save_event")
 async def second(callback: types.CallbackQuery, state:FSMContext):
-    events_len =len(await event.get_all_events())
     data = await state.get_data()
-    print("data")
+    all_events = await event.get_all_events()
+    keys = list()
+    for e in all_events:
+        keys.append(int(e.id_event))
+
+    key = await get_unique_key(keys)
+
     try:
-        await event.add_event(id_event=events_len+1, name=str(data.get('name_event')))
+        await event.add_event(id_event=key, name=str(data.get('name_event')))
         await state.clear()
         await callback.message.answer("Удачно добавлено мероприятие", reply_markup=ikb_back())
     except Exception as err:
         await callback.message.answer("Ошибка сохранения", reply_markup=ikb_back())
         await state.clear()
         print(err)
-
-
-@router.callback_query(F.data == "ikb_delete_name")
-async def second(callback: types.CallbackQuery):
-    await callback.message.answer('get')
