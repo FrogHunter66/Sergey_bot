@@ -20,26 +20,26 @@ router = Router()
     Admin()
 )
 async def first(message: Message):
-    await message.answer("Приветствую, админ, выбери действие", reply_markup=ikb_main_menu())
+    await message.answer("👋Приветствую, админ, выбери действие", reply_markup=ikb_main_menu())
 
 
 @router.callback_query(F.data == "create_event")
 async def second(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("Напишите название мероприятия", reply_markup=ikb_back())
+    await callback.message.answer("📝Напишите название мероприятия", reply_markup=ikb_back())
     await state.set_state(Creation.name_event)
 
 
 @router.callback_query(F.data == "get_events")
 async def second(callback: types.CallbackQuery):
     ikb = await ikb_all_events()
-    await callback.message.answer('Вот они, крассучики', reply_markup=ikb)
+    await callback.message.answer('📅Доступные мероприятия', reply_markup=ikb)
 
 
 @router.message(Creation.name_event, Admin())
 async def name_event(message: Message, state: FSMContext):
     name = message.text
     await state.update_data(name_event=name)
-    await message.answer(f"Сохранить мероприятие с названием '{name}' ?", reply_markup=ikb_save())
+    await message.answer(f"💾Сохранить мероприятие с названием '{name}' ?", reply_markup=ikb_save())
 
 async def get_unique_key(keys):
     for i in range(1000):
@@ -60,8 +60,8 @@ async def second(callback: types.CallbackQuery, state:FSMContext):
     try:
         await event.add_event(id_event=key, name=str(data.get('name_event')))
         await state.clear()
-        await callback.message.answer("Удачно добавлено мероприятие", reply_markup=ikb_back())
+        await callback.message.answer("✅Успешно добавлено мероприятие", reply_markup=ikb_back())
     except Exception as err:
-        await callback.message.answer("Ошибка сохранения", reply_markup=ikb_back())
+        await callback.message.answer("❌Ошибка сохранения❌", reply_markup=ikb_back())
         await state.clear()
         print(err)

@@ -1,3 +1,4 @@
+from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router, F
 from aiogram.enums.dice_emoji import DiceEmoji
@@ -46,16 +47,16 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "ikb_back_choose_type", Current.event)
 async def second(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("""Выберите тип вопроса:
-1 тип - вопрос с единственным правильным ответом
-2 тип - вопрос с множественными правильными ответами""", reply_markup=ikb_types_of_questions())
+    await callback.message.answer("""✏️Выберите тип вопроса:
+1️⃣1 тип \- вопрос с единственным правильным ответом
+🔢2 тип \- вопрос с множественным выбором""", reply_markup=ikb_types_of_questions(),parse_mode=ParseMode.MARKDOWN_V2)
 
 
 @router.callback_query(F.data == "ikb_back_choose_type", Current2.event)
 async def second(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("""Выберите тип вопроса:
-1 тип - вопрос с единственным правильным ответом
-2 тип - вопрос с множественными правильными ответами""", reply_markup=ikb_types_of_questions())
+    await callback.message.answer("""✏️Выберите тип вопроса:
+1️⃣1 тип \- вопрос с единственным правильным ответом
+🔢2 тип \- вопрос с множественным выбором""", reply_markup=ikb_types_of_questions(), parse_mode=ParseMode.MARKDOWN_V2)
     await state.update_data(text=None)
     await state.update_data(variants=None)
     await state.update_data(correct=None)

@@ -24,13 +24,6 @@ from keyboard.ikb_types_questions import ikb_types_of_questions
 from keyboard.ikb_actions_question import ikb_actions_qustion
 router = Router()
 
-@router.message(
-    Command("stadfgfhdfgrt"),
-    Admin()
-)
-async def first(message: Message):
-    await message.answer("Приветствую, админ, выбери действие", reply_markup=ikb_main_menu())
-
 
 @router.callback_query(Current.event, F.data =="ikb_1st_type")
 async def second(query: CallbackQuery, state: FSMContext):
