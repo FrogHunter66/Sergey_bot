@@ -42,7 +42,7 @@ async def second(query: CallbackQuery, callback_data: Choose_event, state: FSMCo
 async def add_test(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     name = data.get("event")
-    await query.message.answer(f"""🗑️Вы действительно хотите *удалить* меропириятие '{name}'?""", reply_markup=ikb_delete_event(), parse_mode=ParseMode.MARKDOWN_V2)
+    await query.message.answer(f"""🗑️Вы действительно хотите *удалить* меропириятие '{name}'?""", reply_markup=ikb_delete_event())#parse_mode_был
 
 
 @router.callback_query(Current.event, F.data == "ikb_delete_forever_event")
@@ -84,13 +84,13 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
 @router.callback_query(Current.event, F.data == "time_to_answer")
 async def add_test2(query: CallbackQuery, state: FSMContext):
     await state.set_state(Current.setting_passing)
-    await query.message.answer("🕒Выберите ограничение по времени выполнения теста, *выразите в минутах*", reply_markup=ikb_back())
+    await query.message.answer("🕒Выберите ограничение по времени выполнения теста, *выразите в минутах*", reply_markup=ikb_back(),  parse_mode=ParseMode.MARKDOWN_V2)
 
 
 @router.callback_query(Current.event, F.data == "time_of_test")
 async def add_test2(query: CallbackQuery, state: FSMContext):
     await state.set_state(Current.setting_time)
-    await query.message.answer("🕒Выберите ограничение по времени существования теста, *выразите в минутах*", reply_markup=ikb_timer())
+    await query.message.answer("🕒Выберите ограничение по времени существования теста, *выразите в минутах*", reply_markup=ikb_timer(), parse_mode=ParseMode.MARKDOWN_V2)
 
 
 @router.message(Current.setting_passing, Admin())
@@ -134,7 +134,7 @@ async def add_test3(message: Message, state: FSMContext):
             if is_unique:
                 code = int(code)
                 await state.update_data(setting_code=code)
-                await message.answer(f"✅Время на прохождение теста *успешно* установлено {code}", parse_mode=ParseMode.MARKDOWN_V2)
+                await message.answer(f"✅Код доступа к тесту *успешно* установлен {code}", parse_mode=ParseMode.MARKDOWN_V2)
                 await message.answer("""🔓Код доступа по которому пользователи смогут получить доступ к тесту
 🕒Время на прохождение теста
 🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
@@ -146,7 +146,7 @@ async def add_test3(message: Message, state: FSMContext):
 🕒Время через которое тест перестанет быть действительным""",
                                      reply_markup=ikb_settings_test())
         else:
-            await message.answer("❌Время должно быть *натуральным числом*", parse_mode=ParseMode.MARKDOWN_V2)
+            await message.answer("❌Код доступа должен быть *натуральным числом*", parse_mode=ParseMode.MARKDOWN_V2)
             await message.answer("""🔓Код доступа по которому пользователи смогут получить доступ к тесту
 🕒Время на прохождение теста
 🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
@@ -224,9 +224,9 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
 async def add_test2(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     id = data.get("event_id")
-    if id:
-        kb = await ikb_all_tests(id)
-        await query.message.answer("📋Список опросов", reply_markup=kb)
-    else:
-        await query.message.answer("📋Список опросов", reply_markup=ikb_back())
+    print("id_event - ", id)
+
+    kb = await ikb_all_tests(id)
+    await query.message.answer("📋Список тестов", reply_markup=kb)
+
 

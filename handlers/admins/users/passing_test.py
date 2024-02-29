@@ -110,7 +110,7 @@ async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: Tak
             await query.message.answer("Еще какой то тип вопроса")
         await state.set_state(User.answer)
     else:
-        await query.message.answer("Время на выполнение теста вышло")
+        await query.message.answer("⏰Время на выполнение теста вышло")
         await state.clear()
 # async def edit_message_reply_markup(
 #         self,
@@ -260,5 +260,5 @@ async def save(query: CallbackQuery, state: FSMContext):
                 print("2nd type ne zachlo")
                 result_minuses += 1
     test_result.clear()
-    await query.message.answer(f"Ваш результат - {result_pluses} правильных ответов, {result_minuses} - неправильных ответов")
+    await query.message.answer(f"📊Ваш результат - {result_pluses} правильных ответов, {result_minuses} - неправильных ответов")
     await state.clear()

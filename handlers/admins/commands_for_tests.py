@@ -38,6 +38,7 @@ async def second(query: CallbackQuery, callback_data: Choose_test, state: FSMCon
     name = data_state.get("event")
     await state.update_data(current_test=num)
     await query.message.answer(f"""*Вы в панели действий для теста* _{num}_ 
+
 *Мероприятия* _{name}_
 
 ⚡Выберите действие⚡""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
@@ -161,7 +162,7 @@ async def add_test2(query: CallbackQuery, state: FSMContext, callback_data: Choo
     id_ev = data.get("event_id")
     test_id = data.get("current_test")
     await tests.update_lifetime(id_event=id_ev, id_test=test_id, new_time=callback_data.id)
-    await query.message.answer(f"Время существования теста успешно установленно [{callback_data.id}]", parse_mode=ParseMode.MARKDOWN_V2)
+    await query.message.answer(f"✅Время существования теста успешно установленно {callback_data.id}", parse_mode=ParseMode.MARKDOWN_V2)
     await query.message.answer("""🔓Код доступа по которому пользователи смогут получить доступ к тесту 
 🕒Время на прохождение теста 
 🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
@@ -202,7 +203,7 @@ async def rebuild_current_quest(querry: CallbackQuery, state: FSMContext, callba
 {vars if vars else "Не заполненно"}
 
 *Правильный ответ*
-{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.MARKDOWN_V2)
+{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())#parse_mode_был
             await state.update_data(question=curr_quest.text)
             await state.update_data(type=2)
             await state.update_data(variants=vars)
@@ -220,7 +221,7 @@ async def rebuild_current_quest(querry: CallbackQuery, state: FSMContext, callba
 {vars if vars else "Не заполненно"}
 
 *Правильный ответ*
-{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.MARKDOWN_V2)
+{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())#parse_mode_был
             await state.update_data(question=curr_quest.text)
             await state.update_data(type=1)
             await state.update_data(variants=vars)
@@ -267,4 +268,4 @@ f"""Вы в редакторе вопроса {id_quest} с выбором {" е
 {variants if variants else "Не заполненно"}
 
 *Правильный ответ*
-{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.MARKDOWN_V2)
+{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())#parse_mode_был

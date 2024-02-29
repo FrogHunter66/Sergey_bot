@@ -41,7 +41,7 @@ router = Router()
     New_User()
 )
 async def first(message: Message):
-    await message.answer("Приветствую, пользователь, нажми зарегистрироваться, чтобы получить доступ к тестам", reply_markup=ikb_start())
+    await message.answer("👋Приветствую, пользователь, нажми зарегистрироваться, чтобы получить доступ к тестам", reply_markup=ikb_start())
 
 
 @router.callback_query(F.data == "ikb_register_new", New_User())
@@ -49,7 +49,7 @@ async def second(query: CallbackQuery, state: FSMContext):
     await state.set_state(User.id)
     await state.update_data(id=query.from_user.id)
     await state.update_data(username=query.from_user.username)
-    await query.message.answer("Представьтесь, как к вам обращаться?")
+    await query.message.answer("🤝Представьтесь, как к вам обращаться?")
 
 
 
@@ -58,14 +58,15 @@ async def first(message: Message, state: FSMContext):
     await users.add_user(id=message.from_user.id, username=message.from_user.username, first_name=message.text, last_name="", status="user")
     name = message.text
     await state.update_data(first_name=name)
-    await message.answer(f"Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
+    await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
     await state.set_state(User.test_code)
 
 @router.message(Command("start"), Old_user())
 async def first(message: Message, state: FSMContext):
     user = await users.get_current_user(message.from_user.id)
     name = user.first_name
-    await message.answer(f"Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
+    print(user)
+    await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
     await state.set_state(User.test_code)
     await state.update_data(first_name=name)
 
@@ -96,11 +97,11 @@ async def start_test(message: Message, state: FSMContext):
 Время до конца существования теста - {differ}
 Количество вопросов - {len(count_quests)}""", reply_markup=ikb_start_test())
         else:
-            await message.answer(f"Тест больше не доступен. Время существования теста истекло")
+            await message.answer(f"⛔Тест больше не доступен. Время существования теста истекло")
     else:
-        await message.answer("По данному коду не было найденно тестов", reply_markup=ikb_back_code())
+        await message.answer("❌По данному коду не было найденно тестов", reply_markup=ikb_back_code())
         name = data.get("name")
-        await message.answer(f"Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
+        await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
 
 
 def serialize_datetime(dt):
@@ -118,7 +119,7 @@ async def second(query: CallbackQuery, state: FSMContext):
     end_time = datetime.datetime.utcnow() + datetime.timedelta(hours=3, minutes=time_to_answer)
     serialized_time = serialize_datetime(end_time)
     await state.update_data(time=serialized_time)
-    await query.message.answer("Вы начали тестирование!!")
+    await query.message.answer("✔️Вы начали тестирование!")
     await query.message.answer(f"Выберите вопрос", reply_markup=kb)
 
 
@@ -126,6 +127,6 @@ async def second(query: CallbackQuery, state: FSMContext):
 async def second(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     name = data.get("first_name")
-    await query.message.answer(f"Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
+    await query.message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
 
 

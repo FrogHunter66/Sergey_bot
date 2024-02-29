@@ -1,3 +1,4 @@
+from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router, F
 from aiogram.enums.dice_emoji import DiceEmoji
@@ -30,13 +31,13 @@ router = Router()
 
 @router.callback_query(Current.rebuild_quest, F.data =="ikb_text_quest")
 async def second(query: CallbackQuery, state: FSMContext):
-    await query.message.answer("Введите текст вопроса", reply_markup=ikb_back())
+    await query.message.answer("❔Введите текст вопроса", reply_markup=ikb_back())
     await state.set_state(Current.rebuild_question)
 
 
 @router.callback_query(Current.rebuild_quest, F.data =="ikb_add_variant")
 async def second(query: CallbackQuery, state: FSMContext):
-    await query.message.answer("Введите вариант ответа", reply_markup=ikb_back())
+    await query.message.answer("🔢Введите вариант ответа", reply_markup=ikb_back())
     await state.set_state(Current.rebuild_variants)
 
 
@@ -48,12 +49,14 @@ async def second(query: CallbackQuery, state: FSMContext):
     variants = current_quest.variants
     if variants:
         lst_vars = list(map(str, variants.split(".*.")))
-        response = "Варианты ответа: \n" + "\n".join(lst_vars)
+        vars = "\n".join(f"{index}) {element}" for index, element in enumerate(lst_vars, start=1))
+        response = "🎯Варианты ответа:" + vars
+
         await query.message.answer(response)
     else:
-        await query.message.answer("Вы пока не ввели правильный вариант ответа")
+        await query.message.answer("🚫Вы пока не ввели правильный вариант ответа")
 
-    await query.message.answer("Выберите ответ, который будет считаться правильным", reply_markup=ikb_back())
+    await query.message.answer("🎯Выберите ответ, который будет считаться правильным", reply_markup=ikb_back())
     await state.set_state(Current.rebuild_correct)
 
 
@@ -66,21 +69,23 @@ async def question(message: Message, state:FSMContext):
     print("changing text")
     await questions.change_text(id_quest, text)
     variants = list(map(str, current_test.variants.split(".*.")))
+    variants = "\n".join(f"{index}\) {element}" for index, element in enumerate(variants, start=1))
     if current_test.type == 1:
         correct = current_test.correct_answer
     elif current_test.type == 2:
         correct = list(map(str, current_test.correct_answer.split(".*.")))
+        correct = "\n".join(f"{index}\) {element}" for index, element in enumerate(correct, start=1))
     else:
         correct = current_test.coorect_answer
-    await message.answer(f"""Предпросмотр вопроса - 
-Текст вопроса:
+    await message.answer(f"""Предпросмотр вопроса \- 
+*Текст вопроса*\:
 {text if text else "Пока не заполненно"}
-------------------------------------------------------
-Варианты ответа:
-{variants if variants else "Пока не заполненно"} 
-------------------------------------------------------
-Правильный ответ:
-{correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())
+
+*Варианты ответа*\:
+{variants if variants else "Пока не заполненно"}
+
+*Правильный ответ*\:
+{correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())#parse_mode_был
     await state.set_state(Current.rebuild_quest)
 
 
@@ -109,17 +114,18 @@ async def question(message: Message, state:FSMContext):
 
 
     list_variants = list(map(str, current_test.variants.split(".*.")))
+    list_variants = "\n".join(f"{index}\) {element}" for index, element in enumerate(list_variants, start=1))
+
     text = current_test.text
-    await message.answer(f"""Вы в конструкторе вопроса с единственным выбором правильного ответа
-Предпросмотр вопроса - 
-Текст вопроса:
+    await message.answer(f"""Предпросмотр вопроса \- 
+*Текст вопроса*\:
 {text if text else "Пока не заполненно"}
-------------------------------------------------------
-Варианты ответа:
+
+*Варианты ответа*\:
 {list_variants if list_variants else "Пока не заполненно"}
-------------------------------------------------------
-Правильный ответ:
-{correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())
+
+*Правильный ответ*\:
+{correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())#parse_mode_был
     await state.set_state(Current.rebuild_quest)
 
 
@@ -131,31 +137,26 @@ async def question(message: Message, state:FSMContext):
     current_quest = await questions.get_current(id_quest)
     question = current_quest.text
     variants = current_quest.variants
-
-
-
-
     try:
         text = int(text)
         if variants:
             vars = list(map(str, variants.split(".*.")))
+
             if text > 0 and text <= len(vars):
                 if current_quest.type == 1:
                     await questions.change_correct(id_quest, vars[text-1])
-                    await message.answer(f"Успешно установлен вариант ответа {text}: {vars[text-1]}")
+                    await message.answer(f"✅Успешно установлен вариант ответа {text}\: {vars[text-1]}")
                     await message.answer(f"""Вы в конструкторе вопроса с единственным выбором правильного ответа
 
-Предпросмотр вопроса -
-Текст вопроса:
+Предпросмотр вопроса \-
+*Текст вопроса*\:
 {question if question else "Пока не заполненно"}
-------------------------------------------------------
-Варианты ответа:
-{vars if vars else "Пока не заполненно"}
-------------------------------------------------------
-Правильный ответ:
-{vars[text - 1] if vars[text - 1] else "Пока не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())
 
-                    # long long await query
+*Варианты ответа*\:
+{vars if vars else "Пока не заполненно"}
+
+*Правильный ответ*\:
+{vars[text - 1] if vars[text - 1] else "Пока не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())#parse_mode_был
                     await state.set_state(Current.rebuild_quest)
                 elif current_quest.type == 2:
                     correct_old = current_quest.correct_answer
@@ -164,7 +165,7 @@ async def question(message: Message, state:FSMContext):
                         await questions.change_correct(id_quest, corrects)
                     else:
                         await questions.change_correct(id_quest, vars[text - 1])
-                    await message.answer(f"Успешно установлен вариант ответа {text}: {vars[text - 1]}")
+                    await message.answer(f"✅Успешно установлен вариант ответа {text}: {vars[text - 1]}")
                     current_quest = await questions.get_current(id_quest)
                     corrects_new = current_quest.correct_answer
                     list_corrects = list(map(str, corrects_new.split(".*.")))
@@ -182,11 +183,11 @@ async def question(message: Message, state:FSMContext):
                 else:
                     pass
             else:
-                await message.answer(f"Выберите вариант ответа от 1 до {len(variants)}", reply_markup=ikb_back()) #todo прописать бэк для Current.corect
+                await message.answer(f"🎯Выберите вариант ответа от 1 до {len(variants)}", reply_markup=ikb_back()) #todo прописать бэк для Current.corect
         else:
-            await message.answer("Ваианты еще не заполнены. Сперва заполните варианты ответа", ikb_actions_rebuild_qustion())
+            await message.answer("⛔Ваианты еще не заполнены. Сперва заполните варианты ответа", ikb_actions_rebuild_qustion())
             await state.set_state(Current.rebuild_quest)
     except:
-        await message.answer(f"Выберите вариант ответа от 1 до {len(variants)}", reply_markup=ikb_back())
+        await message.answer(f"🎯Выберите вариант ответа от 1 до {len(variants)}", reply_markup=ikb_back())
 
 

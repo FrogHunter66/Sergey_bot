@@ -284,12 +284,9 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     id = data.get("event_id")
     print("id ", id)
+    kb = await ikb_all_tests(id)
+    await callback.message.answer("📋Список тестов", reply_markup=kb)
 
-    if id:
-        kb = await ikb_all_tests(id)
-        await callback.message.answer("Список опросов", reply_markup=kb)
-    else:
-        await callback.message.answer("Список опросов", reply_markup=ikb_back())
 
 
 @router.callback_query(Current.current_test, F.data == "ikb_back_all_questions")
