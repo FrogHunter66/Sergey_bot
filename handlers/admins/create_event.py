@@ -1,3 +1,4 @@
+from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router, F
 from aiogram.enums.dice_emoji import DiceEmoji
@@ -20,7 +21,7 @@ router = Router()
     Admin()
 )
 async def first(message: Message):
-    await message.answer("👋Приветствую, админ, выбери действие", reply_markup=ikb_main_menu())
+    await message.answer("👋Приветствую, админ, выбери действие", reply_markup=ikb_main_menu(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "create_event")
@@ -39,7 +40,7 @@ async def second(callback: types.CallbackQuery):
 async def name_event(message: Message, state: FSMContext):
     name = message.text
     await state.update_data(name_event=name)
-    await message.answer(f"💾Сохранить мероприятие с названием '{name}' ?", reply_markup=ikb_save())
+    await message.answer(f"💾Сохранить мероприятие с названием <b>{name}</b> ?", reply_markup=ikb_save(), parse_mode=ParseMode.HTML)
 
 async def get_unique_key(keys):
     for i in range(1000):
@@ -62,6 +63,6 @@ async def second(callback: types.CallbackQuery, state:FSMContext):
         await state.clear()
         await callback.message.answer("✅Успешно добавлено мероприятие", reply_markup=ikb_back())
     except Exception as err:
-        await callback.message.answer("❌Ошибка сохранения❌", reply_markup=ikb_back())
+        await callback.message.answer("❌Ошибка сохранения", reply_markup=ikb_back())
         await state.clear()
         print(err)

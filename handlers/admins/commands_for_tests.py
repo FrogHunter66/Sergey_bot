@@ -37,11 +37,11 @@ async def second(query: CallbackQuery, callback_data: Choose_test, state: FSMCon
     num = data.id_test
     name = data_state.get("event")
     await state.update_data(current_test=num)
-    await query.message.answer(f"""*Вы в панели действий для теста* _{num}_ 
+    await query.message.answer(f"""<b>Вы в панели действий для теста</b> {num} 
 
-*Мероприятия* _{name}_
+<b>Мероприятия</b> _{name}_
 
-⚡Выберите действие⚡""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
+⚡<b>Выберите действие</b>⚡""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
     await state.update_data(event=name)
 
@@ -63,7 +63,7 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
     test = await tests.get_current(id_test=id_test, id_event=id_ev)
     current_code = test.token
     await query.message.answer(f"""🔓Напишите код по которому будет осуществлен доступ к тесту
-*Текущий код {current_code}*""", reply_markup=ikb_back(), parse_mode=ParseMode.MARKDOWN_V2)
+<b>Текущий код</b> {current_code}""", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(Current.current_test, F.data == "time_to_answer")
@@ -188,40 +188,39 @@ async def rebuild_current_quest(querry: CallbackQuery, state: FSMContext, callba
         await state.set_state(Current.rebuild_quest) #todo Нужна новая клавиатура которая позволит удалять вопрос, очищать данные вопроса по отдельности, запись данных напрямую в бд без создания нового вопроса
         varss = curr_quest.variants
         vars = list(map(str, varss.split(".*.")))
-        vars = "\n".join(f"{index}\) {element}" for index, element in enumerate(vars, start=1))
+        vars = "\n".join(f"{index}) {element}" for index, element in enumerate(vars, start=1))
         if curr_quest.type == 2:
             correct = list(map(str, curr_quest.correct_answer.split(".*.")))
-            correct = "\n".join(f"{index}\) {element}" for index, element in enumerate(correct, start=1))
+            correct = "\n".join(f"{index}) {element}" for index, element in enumerate(correct, start=1))
             await querry.message.answer(
-                f"""Вы в редакторе вопроса {curr_quest.id_quest} с выбором {"единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}, 
+                f"""Вы в редакторе вопроса {curr_quest.id_quest} с выбором <b>{"единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}</b> 
 Выберите что бы вы хотели изменить:
 
-*Текст вопроса*
+<b>Текст вопроса</b>
 {curr_quest.text if curr_quest.text else "Не заполненно"}
 
-*Варианты ответа*
+<b>Варианты ответа</b>
 {vars if vars else "Не заполненно"}
 
-*Правильный ответ*
-{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())#parse_mode_был
+<b>Правильный ответ</b>
+{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
             await state.update_data(question=curr_quest.text)
             await state.update_data(type=2)
             await state.update_data(variants=vars)
             await state.update_data(correct=correct)
         elif curr_quest.type == 1:
             correct = curr_quest.correct_answer
-            await querry.message.answer(f"""
-Вы в редакторе вопроса {curr_quest.id_quest} с выбором {" единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}, 
+            await querry.message.answer(f"""Вы в редакторе вопроса {curr_quest.id_quest} с выбором <b>{" единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}</b>
 Выберите что бы вы хотели изменить:
 
-*Текст вопроса*
+<b>Текст вопроса</b>
 {curr_quest.text if curr_quest.text else "Не заполненно"}
 
-*Варианты ответа*
+<b>Варианты ответа</b>
 {vars if vars else "Не заполненно"}
 
-*Правильный ответ*
-{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())#parse_mode_был
+<b>Правильный ответ</b>
+{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
             await state.update_data(question=curr_quest.text)
             await state.update_data(type=1)
             await state.update_data(variants=vars)
@@ -258,14 +257,14 @@ async def second(query: CallbackQuery, state: FSMContext):
         print("err in 251 line commands for test", err)
         await query.message.answer("Произошла ошибка")
         await query.message.answer(
-f"""Вы в редакторе вопроса {id_quest} с выбором {" единственного правильно ответа" if typee == 1 else " множественного правильного ответа "}, 
+f"""Вы в редакторе вопроса {id_quest} с выбором <b>{" единственного правильно ответа" if typee == 1 else " множественного правильного ответа "}</b>
 Выберите что бы вы хотели изменить:
 
-*Текст вопроса*
+<b>Текст вопроса</b>
 {text if text else "Не заполненно"}
 
-*Варианты ответа*
+<b>Варианты ответа</b>
 {variants if variants else "Не заполненно"}
 
-*Правильный ответ*
-{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion())#parse_mode_был
+<b>Правильный ответ</b>
+{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
