@@ -260,5 +260,9 @@ async def save(query: CallbackQuery, state: FSMContext):
                 print("2nd type ne zachlo")
                 result_minuses += 1
     test_result.clear()
-    await query.message.answer(f"📊Ваш результат - {result_pluses} правильных ответов, {result_minuses} - неправильных ответов")
+    await query.message.answer(f"""📊Ваш результат: 
+✅Правильных ответов - {result_pluses} 
+❌Неправильных ответов - {result_minuses}
+
+#results""")
     await state.clear()

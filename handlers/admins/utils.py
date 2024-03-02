@@ -28,21 +28,21 @@ router = Router()
 
 @router.callback_query(F.data == "ikb_back", Current.event)
 async def second(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("Приветствую, дорогой админ, выберите действие", reply_markup=ikb_main_menu())
+    await callback.message.answer("👋Приветствую, дорогой админ, выберите действие", reply_markup=ikb_main_menu())
 
 
 @router.callback_query(F.data == "ikb_back_list_events", Current.event)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
     ikb = await ikb_all_events()
-    await callback.message.answer('Вот они, крассучики', reply_markup=ikb)
+    await callback.message.answer('📅Список доступных мероприятий', reply_markup=ikb)
 
 
 @router.callback_query(F.data == "ikb_back_actions", Current.event)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     name = data.get("event")
-    await callback.message.answer(f"Выберите действие для мероприятия '{name}'", reply_markup=ikb_current_test())
+    await callback.message.answer(f"⚡Выберите действие для мероприятия {name}", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "ikb_back_choose_type", Current.event)
@@ -71,7 +71,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     id = data.get("current_test")
     kb = await ikb_all_questions(id)
-    await callback.message.answer("Выберите действие", reply_markup=kb)
+    await callback.message.answer("⚡Выберите действие⚡", reply_markup=kb)
 
 
 @router.callback_query(F.data == "ikb_back_choose_type", Current.rebuild_quest)
@@ -80,7 +80,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     id = data.get("current_test")
     kb = await ikb_all_questions(id)
-    await callback.message.answer("Выберите действие", reply_markup=kb)
+    await callback.message.answer("⚡Выберите действие⚡", reply_markup=kb)
     await state.update_data(text=None)
     await state.update_data(variants=None)
     await state.update_data(correct=None)
@@ -91,120 +91,126 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     name = data.get("event")
-    await callback.message.answer(f"Выберите действие для мероприятия '{name}'", reply_markup=ikb_current_test())
+    await callback.message.answer(f"⚡Выберите действие для мероприятия <b>{name}</b>", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "ikb_back", Current2.correct)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    text = data.get("text")
+    text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
-    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
-    Предпросмотр вопроса - 
-    Текст вопроса:
-    {text if text else "Пока не заполненно"}
-    ------------------------------------------------------
-    Варианты ответа:
-    {variants if variants else "Пока не заполненно"}
-    ------------------------------------------------------
-    Правильные ответы:
-    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await callback.message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>множественным выбором правильного ответа</b>
+
+Предпросмотр вопроса - 
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильные ответы:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
     await state.set_state(Current2.event)
 
 
 @router.callback_query(F.data == "ikb_back", Current2.question)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    text = data.get("text")
+    text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
-    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
-    Предпросмотр вопроса - 
-    Текст вопроса:
-    {text if text else "Пока не заполненно"}
-    ------------------------------------------------------
-    Варианты ответа:
-    {variants if variants else "Пока не заполненно"}
-    ------------------------------------------------------
-    Правильные ответы:
-    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await callback.message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>множественным выбором правильного ответа</b>
+
+Предпросмотр вопроса - 
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильные ответы:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
     await state.set_state(Current2.event)
 
 
 @router.callback_query(F.data == "ikb_back", Current2.variants)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    text = data.get("text")
+    text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
-    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
-    Предпросмотр вопроса - 
-    Текст вопроса:
-    {text if text else "Пока не заполненно"}
-    ------------------------------------------------------
-    Варианты ответа:
-    {variants if variants else "Пока не заполненно"}
-    ------------------------------------------------------
-    Правильные ответы:
-    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await callback.message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>множественным выбором правильного ответа</b>
+
+Предпросмотр вопроса - 
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильные ответы:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
     await state.set_state(Current2.event)
 
 
 @router.callback_query(F.data == "ikb_back", Current.correct)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    text = data.get("text")
+    text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
-    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
-    Предпросмотр вопроса - 
-    Текст вопроса:
-    {text if text else "Пока не заполненно"}
-    ------------------------------------------------------
-    Варианты ответа:
-    {variants if variants else "Пока не заполненно"}
-    ------------------------------------------------------
-    Правильные ответы:
-    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await callback.message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>выбором единственного правильного ответа</b>
+
+Предпросмотр вопроса - 
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильные ответы:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.event)
 
 
 @router.callback_query(F.data == "ikb_back", Current.question)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    text = data.get("text")
+    text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
-    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
-    Предпросмотр вопроса - 
-    Текст вопроса:
-    {text if text else "Пока не заполненно"}
-    ------------------------------------------------------
-    Варианты ответа:
-    {variants if variants else "Пока не заполненно"}
-    ------------------------------------------------------
-    Правильные ответы:
-    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await callback.message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>выбором единственного правильного ответа</b>
+
+Предпросмотр вопроса - 
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильные ответы:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(),parse_mode=ParseMode.HTML)
     await state.set_state(Current.event)
 
 
 @router.callback_query(F.data == "ikb_back", Current.variants)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    text = data.get("text")
+    text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
-    await callback.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
-    Предпросмотр вопроса - 
-    Текст вопроса:
-    {text if text else "Пока не заполненно"}
-    ------------------------------------------------------
-    Варианты ответа:
-    {variants if variants else "Пока не заполненно"}
-    ------------------------------------------------------
-    Правильные ответы:
-    {correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+    await callback.message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>выбором единственного правильного ответа</b>
+
+Предпросмотр вопроса - 
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильные ответы:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.event)
 
 
@@ -216,7 +222,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
     num = data_state.get("current_test")
     name = data_state.get("event")
-    await callback.message.answer(f"Выберите действие для теста номер '{num}' в мероприятии '{name}'", reply_markup=ikb_rebuild())
+    await callback.message.answer(f"⚡Выберите действие для теста номер <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
 
 
@@ -225,7 +231,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
     num = data_state.get("current_test")
     name = data_state.get("event")
-    await callback.message.answer(f"Выберите действие для теста номер '{num}' в мероприятии '{name}'", reply_markup=ikb_rebuild())
+    await callback.message.answer(f"⚡Выберите действие для теста номер <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
 
 
@@ -234,7 +240,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
     num = data_state.get("current_test")
     name = data_state.get("event")
-    await callback.message.answer(f"Выберите действие для теста номер '{num}' в мероприятии '{name}'", reply_markup=ikb_rebuild())
+    await callback.message.answer(f"⚡Выберите действие для теста номер <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
 
 #-----------------------------------------------------------------
@@ -245,10 +251,10 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
     num = data_state.get("current_test")
     name = data_state.get("event")
-    await callback.message.answer("""Выберите настройки опроса:
-1) Код доступа по которому пользователи смогут получить доступ к тесту
-2) Время на прохождение теста
-3) Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
+    await callback.message.answer("""⚙️Выберите настройки опроса:
+🔓Код доступа по которому пользователи смогут получить доступ к тесту
+🕒Время на прохождение теста
+🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
     await state.set_state(Current.event)
 
 
@@ -257,10 +263,10 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
     num = data_state.get("current_test")
     name = data_state.get("event")
-    await callback.message.answer("""Выберите настройки опроса:
-1) Код доступа по которому пользователи смогут получить доступ к тесту
-2) Время на прохождение теста
-3) Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
+    await callback.message.answer("""⚙️Выберите настройки опроса:
+🔓Код доступа по которому пользователи смогут получить доступ к тесту
+🕒Время на прохождение теста
+🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
     await state.set_state(Current.event)
 
 
@@ -269,10 +275,10 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
     num = data_state.get("current_test")
     name = data_state.get("event")
-    await callback.message.answer("""Выберите настройки опроса:
-1) Код доступа по которому пользователи смогут получить доступ к тесту
-2) Время на прохождение теста
-3) Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
+    await callback.message.answer("""⚙️Выберите настройки опроса:
+🔓Код доступа по которому пользователи смогут получить доступ к тесту
+🕒Время на прохождение теста
+🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
     await state.set_state(Current.event)
 
 #------------------------------------------------------
@@ -295,7 +301,7 @@ async def add_test2(query: types.CallbackQuery, state: FSMContext):
     name = data_state.get("event")
     num = data_state.get("current_test")
     await state.update_data(current_test=num)
-    await query.message.answer(f"Выберите действие для теста номер '{num}' в мероприятии '{name}'", reply_markup=ikb_rebuild())
+    await query.message.answer(f"⚡Выберите действие для теста номер <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(Current.event, F.data == "ikb_back_all_questions")
@@ -304,9 +310,9 @@ async def add_test2(query: types.CallbackQuery, state: FSMContext):
     name = data_state.get("event")
     num = data_state.get("current_test")
     await state.update_data(current_test=num)
-    await query.message.answer(f"Выберите действие для теста номер '{num}' в мероприятии '{name}'", reply_markup=ikb_rebuild())
+    await query.message.answer(f"⚡Выберите действие для теста номер <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "ikb_back")
 async def second(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("Приветствую, дорогой админ, выберите действие", reply_markup=ikb_main_menu())
+    await callback.message.answer("👋Приветствую, дорогой админ, выберите действие", reply_markup=ikb_main_menu())

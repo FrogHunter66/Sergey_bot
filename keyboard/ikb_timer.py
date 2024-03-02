@@ -34,7 +34,7 @@ def ikb_timer():
     btn11 = InlineKeyboardButton(text="1 неделя", callback_data=cb11)
     cb12 = Choose_timeer(cb="ikb_time", id="without").pack()
     btn12 = InlineKeyboardButton(text="Неограниченно", callback_data=cb12)
-    btn13 = InlineKeyboardButton(text="Назад", callback_data="ikb_back")
+    btn13 = InlineKeyboardButton(text="↩️Назад", callback_data="ikb_back")
     builder = InlineKeyboardMarkup(
         inline_keyboard=[[btn1, btn2, btn3, btn4],
                          [btn5, btn6, btn7, btn8],

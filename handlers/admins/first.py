@@ -33,17 +33,32 @@ async def second(query: CallbackQuery, state: FSMContext):
     text = data.get("text")
     variants = data.get("variants")
     correct = data.get("correct")
-    await query.message.answer(f"""🛠️Вы в конструктуоре вопроса c *единственным* правильным ответом
-*Предпросмотр вопроса* 
+    if variants:
+        list_vars = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_vars, start=1))
+        await query.message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+Предпросмотр вопроса: 
 
-*Текст вопроса*\:
-{text if text else "Пока не заполненно"}
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
 
-*Варианты ответа*\:
-{variants if variants else "Пока не заполненно"}
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
 
-*Правильный ответ*\:
-{correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())#parse_mode_был
+<b>Правильный ответ:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)  # p
+    else:
+        await query.message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+Предпросмотр вопроса: 
+    
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+    
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+    
+<b>Правильный ответ:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
 
 
 
@@ -65,7 +80,7 @@ async def second(query: CallbackQuery, state: FSMContext):
     variants = data.get("variants")
     if variants:
         lst_vars = list(map(str, variants.split(".*.")))
-        vars = "\n".join(f"{index}\) {element}" for index, element in enumerate(lst_vars, start=1))
+        vars = "\n".join(f"{index}) {element}" for index, element in enumerate(lst_vars, start=1))
         response = f"🎯Варианты ответа: {vars}"
         await query.message.answer(response)
     else:
@@ -82,15 +97,34 @@ async def question(message: Message, state:FSMContext):
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
-    await message.answer(f"""Предпросмотр вопроса \- 
-*Текст вопроса*\:
-{text if text else "Пока не заполненно"}
+    if variants:
+        list_vars = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_vars, start=1))
+        await message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+Предпросмотр вопроса: 
 
-*Варианты ответа*\:
-{variants if variants else "Пока не заполненно"}
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
 
-*Правильный ответ*\:
-{correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())#parse_mode_был
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильный ответ:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)  # p
+    else:
+        await message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+Предпросмотр вопроса: 
+
+<b>Текст вопроса:</b>
+    {text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильный ответ:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)  # parse_mode_был
+
+
     await state.set_state(Current.event)
 
 
@@ -107,19 +141,23 @@ async def question(message: Message, state:FSMContext):
         await state.update_data(variants=text)
     data_new = await state.get_data()
     variants = data_new.get("variants")
-    list_variants = list(map(str, variants.split(".*.")))
     text = data_new.get("question")
     correct = data_new.get("correct")
-    await message.answer(f"""Вы в конструкторе вопроса с единственным выбором правильного ответа
-Предпросмотр вопроса - 
-*Текст вопроса*\:
-{text if text else "Пока не заполненно"}
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_variants, start=1))
 
-*Варианты ответа*\:
-{list_variants if list_variants else "Пока не заполненно"}
+    await message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+Предпросмотр вопроса: 
 
-*Правильный ответ*\:
-{correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())#parse_mode_был
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильный ответ:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)  # p
     await state.set_state(Current.event)
 
 
@@ -135,25 +173,28 @@ async def question(message: Message, state:FSMContext):
             vars = list(map(str, vars.split(".*.")))
             if text > 0 and text <= len(vars):
                 await state.update_data(correct=vars[text-1])
-                await message.answer(f"✅Успешно установлен вариант ответа *{text}*\: *{vars[text-1]}*")
-                await message.answer(f"""Вы в конструкторе вопроса с единственным выбором правильного ответа
-*Предпросмотр вопроса* \-
-*Текст вопроса*\:
-{qest if qest else "Пока не заполненно"}
+                variants = "\n".join(f"{index}) {element}" for index, element in enumerate(vars, start=1))
 
-*Варианты ответа*\:
-{vars if vars else "Пока не заполненно"}
+                await message.answer(f"✅Успешно установлен вариант ответа <b>{text}: {vars[text-1]}</b>", parse_mode=ParseMode.HTML)
+                await message.answer(f"""️🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+Предпросмотр вопроса: 
 
-*Правильный ответ*\:
-{vars[text-1] if vars[text-1] else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())#parse_mode_был
+<b>Текст вопроса:</b>
+{qest if qest else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильный ответ:</b>
+{vars[text-1] if vars[text-1] else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
                 await state.set_state(Current.event)
             else:
-                await message.answer(f"☑️Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back()) #todo прописать бэк для Current.corect
+                await message.answer(f"☑️Выберите вариант ответа <b>от 1 до {len(vars)}</b>", reply_markup=ikb_back(), parse_mode=ParseMode.HTML) #todo прописать бэк для Current.corect
         else:
             await message.answer("❌Варианты еще не заполнены. Сперва заполните варианты ответа", ikb_actions_qustion())
             await state.set_state(Current.event)
     except:
-        await message.answer(f"☑️Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back())
+        await message.answer(f"☑️Выберите вариант ответа <b>от 1 до {len(vars)}</b>", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
 
 async def get_unique_value(values):
     for i in range(10000):
@@ -191,9 +232,9 @@ async def second(query: CallbackQuery, state: FSMContext):
         except:
             await query.message.answer("❌Произошла ошибка")
             kb = await ikb_all_questions(test_id)
-            await query.message.answer("⚡Выберите действие для вопросов", reply_markup=kb)
+            await query.message.answer("⚡Выберите действие для вопросов⚡", reply_markup=kb)
     else:
-        await query.message.answer(f"""Вы не заполнили одно из полей:
-Текст вопроса - {quest if quest else "Не заполненно"}
-Варианты ответа - {quest if quest else "Не заполнены"}
-Правильный вариант ответа - {quest if quest else "Не заполнен"}""",  reply_markup=ikb_actions_qustion())
+        await query.message.answer(f"""⛔Вы не заполнили одно из полей:
+Текст вопроса - {quest if quest else "❌Не заполненно"}
+Варианты ответа - {vars if vars else "❌Не заполнены"}
+Правильный вариант ответа - {correct if correct else "❌Не заполнено"}""",  reply_markup=ikb_actions_qustion())

@@ -35,7 +35,7 @@ async def ikb_pass_test(id_quest, mark):
             btn1 = InlineKeyboardButton(text=f"{i+1}-й ответ",
                                         callback_data=cb)
             lst.append(btn1)
-    btn3 = (InlineKeyboardButton(text="Сохранить ответ", callback_data=f"ikb_save_answer"))
+    btn3 = (InlineKeyboardButton(text="💾Сохранить ответ", callback_data=f"ikb_save_answer"))
     ss = [[m] for m in lst]
     ss.append([btn3])
     builder = InlineKeyboardMarkup(inline_keyboard=ss)

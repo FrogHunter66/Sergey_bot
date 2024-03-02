@@ -193,7 +193,7 @@ async def rebuild_current_quest(querry: CallbackQuery, state: FSMContext, callba
             correct = list(map(str, curr_quest.correct_answer.split(".*.")))
             correct = "\n".join(f"{index}) {element}" for index, element in enumerate(correct, start=1))
             await querry.message.answer(
-                f"""Вы в редакторе вопроса {curr_quest.id_quest} с выбором <b>{"единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}</b> 
+                f"""🛠️Вы в редакторе вопроса {curr_quest.id_quest} с выбором <b>{"единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}</b> 
 Выберите что бы вы хотели изменить:
 
 <b>Текст вопроса</b>
@@ -210,7 +210,7 @@ async def rebuild_current_quest(querry: CallbackQuery, state: FSMContext, callba
             await state.update_data(correct=correct)
         elif curr_quest.type == 1:
             correct = curr_quest.correct_answer
-            await querry.message.answer(f"""Вы в редакторе вопроса {curr_quest.id_quest} с выбором <b>{" единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}</b>
+            await querry.message.answer(f"""🛠️Вы в редакторе вопроса {curr_quest.id_quest} с выбором <b>{" единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}</b>
 Выберите что бы вы хотели изменить:
 
 <b>Текст вопроса</b>
@@ -257,7 +257,7 @@ async def second(query: CallbackQuery, state: FSMContext):
         print("err in 251 line commands for test", err)
         await query.message.answer("Произошла ошибка")
         await query.message.answer(
-f"""Вы в редакторе вопроса {id_quest} с выбором <b>{" единственного правильно ответа" if typee == 1 else " множественного правильного ответа "}</b>
+f"""🛠️Вы в редакторе вопроса {id_quest} с выбором <b>{" единственного правильно ответа" if typee == 1 else " множественного правильного ответа "}</b>
 Выберите что бы вы хотели изменить:
 
 <b>Текст вопроса</b>

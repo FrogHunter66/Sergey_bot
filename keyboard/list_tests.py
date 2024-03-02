@@ -22,6 +22,6 @@ async def ikb_all_tests(id):
         cb = Choose_test(cb="ikb_tests", id=event.id_test).pack()
         btn1 = InlineKeyboardButton(text=f"{event.id_test} - й тест", callback_data=cb)
         lst.append(btn1)
-    btn3 = (InlineKeyboardButton(text="Назад", callback_data=f"ikb_back_tochoose_opros"))
+    btn3 = (InlineKeyboardButton(text="↩️Назад", callback_data=f"ikb_back_tochoose_opros"))
     builder = InlineKeyboardMarkup(inline_keyboard=[lst, [btn3]])
     return builder

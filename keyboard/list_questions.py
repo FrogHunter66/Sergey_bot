@@ -18,7 +18,7 @@ async def ikb_all_questions(id):
         cb = Choose_quest(cb="ikb_pickquestion", id=event.id_quest).pack()
         btn1 = InlineKeyboardButton(text=f"{i+1} - й вопрос", callback_data=cb)
         lst.append(btn1)
-    btn2 = InlineKeyboardButton(text="Добавить вопрос", callback_data=f"ikb_add_to_current")
-    btn3 = (InlineKeyboardButton(text="Назад", callback_data=f"ikb_back_all_questions"))
+    btn2 = InlineKeyboardButton(text="➕Добавить вопрос", callback_data=f"ikb_add_to_current")
+    btn3 = (InlineKeyboardButton(text="↩️Назад", callback_data=f"ikb_back_all_questions"))
     builder = InlineKeyboardMarkup(inline_keyboard=[lst, [btn2], [btn3]])
     return builder

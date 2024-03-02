@@ -19,6 +19,6 @@ async def ikb_all_events():
         btn1 = InlineKeyboardButton(text=i.event_name,
                                     callback_data=cb)
         lst.append(btn1)
-    btn3 = (InlineKeyboardButton(text="Назад", callback_data=f"ikb_back"))
+    btn3 = (InlineKeyboardButton(text="↩️Назад", callback_data=f"ikb_back"))
     builder = InlineKeyboardMarkup(inline_keyboard=[lst, [btn3]])
     return builder

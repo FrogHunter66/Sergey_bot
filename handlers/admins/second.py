@@ -32,28 +32,36 @@ async def second(query: CallbackQuery, state: FSMContext):
     text = data.get("text")
     variants = data.get("variants")
     correct = data.get("correct")
-    await query.message.answer(f"""Вы в конструктуоре вопроса с множественным ответом выберите действие
-Предпросмотр вопроса - 
-Текст вопроса:
-{text if text else "Пока не заполненно"}
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_variants, start=1))
+    if correct:
+        list_corrects = list(map(str, variants.split(".*.")))
+        correct = "\n".join(f"{index}) {element}" for index, element in enumerate(list_corrects, start=1))
+
+    await query.message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>множественным правильным ответом</b>
+Предпросмотр вопроса: 
+
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
 ------------------------------------------------------
-Варианты ответа:
-{variants if variants else "Пока не заполненно"}
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
 ------------------------------------------------------
-Правильные ответы:
-{correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+<b>Правильные ответы:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(),parse_mode=ParseMode.HTML)
     await state.set_state(Current2.event)
 
 
 @router.callback_query(Current2.event, F.data =="ikb_text_quest")
 async def second(query: CallbackQuery, state: FSMContext):
-    await query.message.answer("Введите текст вопроса", reply_markup=ikb_back())
+    await query.message.answer("❔Введите текст вопроса", reply_markup=ikb_back())
     await state.set_state(Current2.question)
 
 
 @router.callback_query(Current2.event, F.data =="ikb_add_variant")
 async def second(query: CallbackQuery, state: FSMContext):
-    await query.message.answer("Введите вариант ответа", reply_markup=ikb_back())
+    await query.message.answer("🔠Введите вариант ответа", reply_markup=ikb_back())
     await state.set_state(Current2.variants)
 
 
@@ -64,11 +72,12 @@ async def second(query: CallbackQuery, state: FSMContext):
 
     if variants:
         lst_vars = list(map(str, variants.split(".*.")))
-        response = "Варианты ответа: \n" + "\n".join(lst_vars)
+        vars = "\n".join(f"{index}) {element}" for index, element in enumerate(lst_vars, start=1))
+        response = f"🎯Варианты ответа: {vars}"
         await query.message.answer(response)
     else:
-        await query.message.answer("Вы пока не ввели правильный вариант ответа")
-    await query.message.answer("Выберите ответ, который будет считаться правильным", reply_markup=ikb_back())
+        await query.message.answer("❌Вы пока не ввели правильный вариант ответа")
+    await query.message.answer("🎯Выберите ответ, который будет считаться правильным", reply_markup=ikb_back())
     await state.set_state(Current2.correct)
 
 
@@ -80,17 +89,24 @@ async def question(message: Message, state:FSMContext):
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
-    await message.answer(f"""Вы в конструкторе вопроса с множественным выбором правильного ответа
+
+    if variants:
+        list_vars = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_vars, start=1))
+    if correct:
+        list_corrects = list(map(str, correct.split(".*.")))
+        correct = "\n".join(f"{index}) {element}" for index, element in enumerate(list_corrects, start=1))
+    await message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>множественным выбором правильного ответа</b>
 
 Предпросмотр вопроса - 
-Текст вопроса:
-{text if text else "Пока не заполненно"}
-------------------------------------------------------
-Варианты ответа:
-{variants if variants else "Пока не заполненно"}
-------------------------------------------------------
-Правильные ответы:
-{correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильные ответы:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
     await state.set_state(Current2.event)
 
 
@@ -110,17 +126,17 @@ async def question(message: Message, state:FSMContext):
     list_variants = list(map(str, variants.split(".*.")))
     text = data_new.get("question")
     correct = data_new.get("correct")
-    await message.answer(f"""Вы в конструкторе вопроса с множественным выбором правильного ответа
+    await message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>множественным выбором правильного ответа</b>
 
 Предпросмотр вопроса - 
-Текст вопроса:
-{text if text else "Пока не заполненно"}
-------------------------------------------------------
-Варианты ответа:
-{list_variants if list_variants else "Пока не заполненно"}
-------------------------------------------------------
-Правильные ответы:
-{correct if correct else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{list_variants if list_variants else "❌Не заполненно"}
+
+<b>Правильные ответы:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
     await state.set_state(Current2.event)
 
 
@@ -142,31 +158,33 @@ async def question(message: Message, state:FSMContext):
                     await state.update_data(correct=corrects)
                 else:
                     await state.update_data(correct=vars[text-1])
-                await message.answer(f"Успешно установлен вариант ответа {text}: {vars[text-1]}")
+                await message.answer(f"✅Успешно установлен вариант ответа <b>{text}: {vars[text-1]}</b>", parse_mode=ParseMode.HTML)
                 data_new = await state.get_data()
                 variants = data_new.get("correct")
                 list_corrects = list(map(str, variants.split(".*.")))
+                list_corrects = "\n".join(f"{index}) {element}" for index, element in enumerate(list_corrects, start=1))
+                vars = "\n".join(f"{index}) {element}" for index, element in enumerate(vars, start=1))
 
-                await message.answer(f"""Вы в конструкторе вопроса с множественным выбором правильного ответа
-                
-Предпросмотр вопроса -
-Текст вопроса:
-{qest if qest else "Пока не заполненно"}
-------------------------------------------------------
-Варианты ответа:
-{vars if vars else "Пока не заполненно"}
-------------------------------------------------------
-Правильный ответ:
-{list_corrects if list_corrects else "Пока не заполненно"}""", reply_markup=ikb_actions_qustion())
+                await message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>множественным выбором правильного ответа</b>
+
+Предпросмотр вопроса - 
+<b>Текст вопроса:</b>
+{qest if qest else "❌Не заполненно"}
+
+<b>Варианты ответа:<b>
+{vars if vars else "❌Не заполненно"}
+
+<b>Правильный ответ:</b>
+{list_corrects if list_corrects else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
                 await state.set_state(Current2.event)
             else:
-                await message.answer(f"Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back()) #todo прописать бэк для Current.corect
+                await message.answer(f"☑️Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back()) #todo прописать бэк для Current.corect
 
         else:
-            await message.answer("Ваианты еще не заполнены. Сперва заполните варианты ответа", ikb_actions_qustion())
+            await message.answer("❌Ваианты еще не заполнены. Сперва заполните варианты ответа", ikb_actions_qustion())
             await state.set_state(Current2.event)
     except:
-        await message.answer(f"Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back())
+        await message.answer(f"☑️Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back())
 
 
 @router.callback_query(Current2.event, F.data =="ikb_add_question_test")
@@ -184,20 +202,20 @@ async def second(query: CallbackQuery, state: FSMContext):
     if quest and vars and correct:
         try:
             await questions.add_test(id_test=test_id, id_quest=len(all_quests)+1, correct_answer=correct, quest_type=types, variants=vars, text=quest)
-            await query.message.answer("Вопрос успешно добавлен")
+            await query.message.answer("✅Вопрос успешно добавлен")
             kb = await ikb_all_questions(test_id)
-            await query.message.answer("Выберите действие для вопросов", reply_markup=kb)
+            await query.message.answer("⚡Выберите действие для вопросов⚡", reply_markup=kb)
             await state.update_data(question='')
             await state.update_data(variants='')
             await state.update_data(correct='')
             await state.update_data(type='')
             await state.set_state(Current.current_test)
         except Exception as err:
-            await query.message.answer("Произошла ошибка")
+            await query.message.answer("❌Произошла ошибка")
             kb = await ikb_all_questions(test_id)
-            await query.message.answer("Выберите действие для вопросов", reply_markup=kb)
+            await query.message.answer("⚡Выберите действие для вопросов⚡", reply_markup=kb)
     else:
-        await query.message.answer(f"""Вы не заполнили одно из полей:
-Текст вопроса - {quest if quest else "Не заполненно"}
-Варианты ответа - {quest if quest else "Не заполнены"}
-Правильный вариант ответа - {quest if quest else "Не заполнен"}""", reply_markup=ikb_actions_qustion())
+        await query.message.answer(f"""⛔Вы не заполнили одно из полей:
+Текст вопроса - {quest if quest else "❌Не заполненно"}
+Варианты ответа - {vars if vars else "❌Не заполненно"}
+Правильный вариант ответа - {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion())

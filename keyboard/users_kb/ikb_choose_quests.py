@@ -19,6 +19,6 @@ async def ikb_get_all_quests(id_test):
         btn1 = InlineKeyboardButton(text=f"{i+1} - й вопрос",
                                     callback_data=cb)
         lst.append(btn1)
-    btn3 = (InlineKeyboardButton(text="Заврешить тест", callback_data=f"ikb_finish"))
+    btn3 = (InlineKeyboardButton(text="🏁Заврешить тест", callback_data=f"ikb_finish"))
     builder = InlineKeyboardMarkup(inline_keyboard=[lst, [btn3]])
     return builder
