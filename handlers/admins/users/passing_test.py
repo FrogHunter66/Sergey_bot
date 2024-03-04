@@ -35,6 +35,7 @@ from utils.db_api.quck_commands import tests, questions
 from keyboard.users_kb.ikb_start_test import ikb_start_test
 from keyboard.users_kb.ikb_back_code import ikb_back_code
 from utils.db_api.quck_commands import users
+from utils.db_api.quck_commands import results
 router = Router()
 test_result = {}
 
@@ -93,19 +94,19 @@ async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: Tak
         differ = end_time-current_time
         if type_quest == 1:
             kb = await ikb_pass_test(id_quest, mark)
-            await query.message.answer(f"""Вопрос с единственным выбором ответа.
-Время до заврешения теста - {differ}
+            await query.message.answer(f"""☑️Вопрос <b>с единственным выбором ответа.</b>
+🕒Время до заврешения теста - <b>{differ}</b>
     
 {text}
-{variants}""", reply_markup=kb)
+{variants}""", reply_markup=kb, parse_mode=ParseMode.HTML)
         elif type_quest == 2:
             kb = await ikb_pass_test(id_quest, mark)
 
-            await query.message.answer(f"""Вопрос со множественным выбором ответа.
-Время до заврешения теста - {differ}
+            await query.message.answer(f"""🔢Вопрос <b>со множественным выбором ответа.</b>
+🕒Время до заврешения теста - {differ}
             
 {text}
-{variants}""", reply_markup=kb)
+{variants}""", reply_markup=kb, parse_mode=ParseMode.HTML)
         else:
             await query.message.answer("Еще какой то тип вопроса")
         await state.set_state(User.answer)
@@ -199,7 +200,8 @@ async def save(query: CallbackQuery, state: FSMContext):
     current_time = (datetime.datetime.utcnow() + datetime.timedelta(hours=3)).replace(microsecond=0)
     if end_time > current_time:
         differ = (end_time - current_time)
-        await query.message.answer(f"Выберите вопрос, время до окончания тестировани - {differ}", reply_markup=kb)
+        await query.message.answer(f"""👉Выберите вопрос
+🕒Время до окончания теста - <b>{differ}</b>""", reply_markup=kb, parse_mode=ParseMode.HTML)
 
 
 
@@ -209,6 +211,8 @@ async def save(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     id_test = data.get("current_test")
     all_quests = await questions.get_questions(id_test)
+    lst_res = list()
+
     result_pluses = 0
     result_minuses = 0
 
@@ -222,12 +226,12 @@ async def save(query: CallbackQuery, state: FSMContext):
 
             if test_result.get(quest.id_quest) == str(num):
                 result_pluses += 1
+                lst_res.append(1)
                 print("1st type good")
             else:
+                lst_res.append(0)
                 result_minuses += 1
                 print("1st type ploho")
-
-
         elif quest.type == 2:
             correct = quest.correct_answer
             correct = list(map(str, correct.split(".*.")))
@@ -236,8 +240,6 @@ async def save(query: CallbackQuery, state: FSMContext):
             nums = list()
             for cor in correct:
                 nums.append(str(variants.index(cor)+1))
-
-
             try:
                 user_answers = test_result.get(quest.id_quest)
                 user_answers = [m for m in user_answers]
@@ -248,18 +250,23 @@ async def save(query: CallbackQuery, state: FSMContext):
                 for answer in user_answers:
                     if answer not in nums:
                         flag = False
+                        lst_res.append(0)
                         result_minuses += 1
                         break
                 if flag:
                     print('2nd type good')
+                    lst_res.append(1)
                     result_pluses += 1
                 else:
                     print('2nd type ploho')
-                    result_minuses -= 1
+                    lst_res.append(0)
+                    result_minuses += 1
             except:
                 print("2nd type ne zachlo")
+                lst_res.append(0)
                 result_minuses += 1
     test_result.clear()
+    print(lst_res) #todo проверить работоспособность этого списка
     await query.message.answer(f"""📊Ваш результат: 
 ✅Правильных ответов - {result_pluses} 
 ❌Неправильных ответов - {result_minuses}

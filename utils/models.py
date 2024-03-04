@@ -67,8 +67,6 @@ class Results(BaseModel):
     result = db.Column(db.String)
 
 
-
-
 async def create_tables():
     await db.set_bind(POSTGRES_URI)
     await db.gino.create_all()
