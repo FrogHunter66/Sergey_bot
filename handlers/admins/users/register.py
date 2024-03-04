@@ -1,5 +1,6 @@
 import pickle
 
+from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router, F
 from aiogram.enums.dice_emoji import DiceEmoji
@@ -33,6 +34,8 @@ from utils.db_api.quck_commands import tests, questions
 from keyboard.users_kb.ikb_start_test import ikb_start_test
 from keyboard.users_kb.ikb_back_code import ikb_back_code
 from keyboard.users_kb.ikb_choose_quests import ikb_get_all_quests
+from utils.db_api.quck_commands import results
+from keyboard.users_kb.ikb_lks import ikb_lks, Current_lks
 from utils.db_api.quck_commands import users
 router = Router()
 
@@ -58,17 +61,25 @@ async def first(message: Message, state: FSMContext):
     await users.add_user(id=message.from_user.id, username=message.from_user.username, first_name=message.text, last_name="", status="user")
     name = message.text
     await state.update_data(first_name=name)
-    await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
+    await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти", reply_markup=ikb_lks(message.from_user.id))
     await state.set_state(User.test_code)
 
 @router.message(Command("start"), Old_user())
 async def first(message: Message, state: FSMContext):
     user = await users.get_current_user(message.from_user.id)
     name = user.first_name
-    print(user)
-    await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
+    await message.answer(f"""👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти""", parse_mode=ParseMode.HTML, reply_markup=ikb_lks(message.from_user.id))
     await state.set_state(User.test_code)
     await state.update_data(first_name=name)
+
+
+@router.callback_query(Current_lks.filter(F.cb=="ikb_lks"))
+async def take_quest(query: CallbackQuery, callback_data: Current_lks):
+    id = callback_data.id
+
+
+    await query.message.answer("Вы в личном кабинете")
+
 
 
 @router.message(User.test_code, Old_user())

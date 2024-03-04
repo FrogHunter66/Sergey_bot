@@ -59,6 +59,15 @@ class User(BaseModel):
     status = db.Column(db.String)
 
 
+class Results(BaseModel):
+    __tablename__ = 'results'
+    id = db.Column(db.BigInteger, primary_key=True, nullable=False)
+    id_test = db.Column(db.BigInteger)
+    id_user = db.Column(db.BigInteger)
+    result = db.Column(db.String)
+
+
+
 
 async def create_tables():
     await db.set_bind(POSTGRES_URI)
