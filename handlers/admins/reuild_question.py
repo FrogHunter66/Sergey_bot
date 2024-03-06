@@ -147,7 +147,7 @@ async def question(message: Message, state:FSMContext):
             if text > 0 and text <= len(vars):
                 if current_quest.type == 1:
                     await questions.change_correct(id_quest, vars[text-1])
-                    await message.answer(f"✅Успешно установлен вариант ответа {text}\: {vars[text-1]}")
+                    await message.answer(f"✅Успешно установлен вариант ответа <b>{text}: {vars[text-1]}</b>", parse_mode=ParseMode.HTML)
                     await message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
 Предпросмотр вопроса: 
 
@@ -167,7 +167,7 @@ async def question(message: Message, state:FSMContext):
                         await questions.change_correct(id_quest, corrects)
                     else:
                         await questions.change_correct(id_quest, vars[text - 1])
-                    await message.answer(f"✅Успешно установлен вариант ответа {text}: {vars[text - 1]}")
+                    await message.answer(f"✅Успешно установлен вариант ответа <b>{text}: {vars[text - 1]}</b>", parse_mode=ParseMode.HTML)
                     current_quest = await questions.get_current(id_quest)
                     corrects_new = current_quest.correct_answer
                     list_corrects = list(map(str, corrects_new.split(".*.")))
@@ -187,11 +187,15 @@ async def question(message: Message, state:FSMContext):
                 else:
                     pass
             else:
-                await message.answer(f"🎯Выберите вариант ответа от 1 до {len(variants)}", reply_markup=ikb_back()) #todo прописать бэк для Current.corect
+                await message.answer(f"🎯Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back()) #todo прописать бэк для Current.corect
         else:
             await message.answer("⛔Ваианты еще не заполнены. Сперва заполните варианты ответа", ikb_actions_rebuild_qustion())
             await state.set_state(Current.rebuild_quest)
     except:
-        await message.answer(f"🎯Выберите вариант ответа от 1 до {len(variants)}", reply_markup=ikb_back())
+        if variants:
+            vars = list(map(str, variants.split(".*.")))
+            await message.answer(f"🎯Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back())
+        else:
+            await message.answer(f"Вы еще не вписали варианты ответа")
 
 

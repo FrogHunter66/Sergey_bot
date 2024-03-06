@@ -4,7 +4,7 @@ from loader import bot
 from asyncpg import UniqueViolationError
 
 
-async def add_test(id_test:int, setting_code:int, setting_passing:int, setting_time:str, id_event:int):
+async def add_test(id_test:int, setting_code:int, setting_passing:int, setting_time:str, id_event:int, name:str):
     setting_time1 = setting_time
     current_time = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
 
@@ -20,7 +20,7 @@ async def add_test(id_test:int, setting_code:int, setting_passing:int, setting_t
     else:
         end_time = datetime.datetime(2030, 1, 1, 0, 0, 0)
 
-    test = Test(id_test=id_test, token=setting_code, lifetime=setting_time1, bound_time=setting_passing, id_event=id_event, end_time=end_time)
+    test = Test(id_test=id_test, token=setting_code, lifetime=setting_time1, bound_time=setting_passing, id_event=id_event, end_time=end_time, name=name)
     await test.create()
 
 
@@ -59,3 +59,8 @@ async def update_bound_time(id_test, id_event, new_time):
 async def update_lifetime(id_test, id_event, new_time):
     user = await get_current(id_event=id_event, id_test=id_test)
     await user.update(lifetime=new_time).apply()
+
+
+async def update_name(id_test, id_event, new_name):
+    user = await get_current(id_event=id_event, id_test=id_test)
+    await user.update(name=new_name).apply()

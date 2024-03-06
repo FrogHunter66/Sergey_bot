@@ -1,4 +1,7 @@
 import pickle
+
+from aiogram.enums import ParseMode
+
 from bot import bot
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router, F
@@ -227,11 +230,9 @@ async def save(query: CallbackQuery, state: FSMContext):
             if test_result.get(quest.id_quest) == str(num):
                 result_pluses += 1
                 lst_res.append(1)
-                print("1st type good")
             else:
                 lst_res.append(0)
                 result_minuses += 1
-                print("1st type ploho")
         elif quest.type == 2:
             correct = quest.correct_answer
             correct = list(map(str, correct.split(".*.")))
@@ -244,9 +245,7 @@ async def save(query: CallbackQuery, state: FSMContext):
                 user_answers = test_result.get(quest.id_quest)
                 user_answers = [m for m in user_answers]
                 flag = True
-                print("2nd type zashlo")
-                print("user ", user_answers)
-                print("correct ", nums)
+
                 for answer in user_answers:
                     if answer not in nums:
                         flag = False
@@ -254,22 +253,26 @@ async def save(query: CallbackQuery, state: FSMContext):
                         result_minuses += 1
                         break
                 if flag:
-                    print('2nd type good')
                     lst_res.append(1)
                     result_pluses += 1
                 else:
-                    print('2nd type ploho')
                     lst_res.append(0)
                     result_minuses += 1
             except:
-                print("2nd type ne zachlo")
                 lst_res.append(0)
                 result_minuses += 1
     test_result.clear()
-    print(lst_res) #todo проверить работоспособность этого списка
+    id_test = data.get("current_test")
+#6799017808
+    print(query.from_user.id)
+    await results.add_result(id_test=id_test, id_user=query.from_user.id, result=lst_res)
     await query.message.answer(f"""📊Ваш результат: 
-✅Правильных ответов - {result_pluses} 
-❌Неправильных ответов - {result_minuses}
+✅ Правильных ответов - {result_pluses} 
+
+❌ Неправильных ответов - {result_minuses}
+
+🎯 Выполнения - {(result_pluses / len(all_quests) * 100)//1}
+
 
 #results""")
     await state.clear()

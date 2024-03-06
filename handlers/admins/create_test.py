@@ -61,7 +61,7 @@ async def add_test(query: CallbackQuery, state: FSMContext):
 
 @router.callback_query(Current.event, F.data == "ikb_back_from_delete")
 async def add_test(query: CallbackQuery, state: FSMContext):
-    await query.message.answer("🗑️Приветствую, админ, выбери действие", reply_markup=ikb_main_menu())
+    await query.message.answer("👋Приветствую, админ, выбери действие", reply_markup=ikb_main_menu())
     await state.clear()
 
 
@@ -70,9 +70,16 @@ async def add_test(query: CallbackQuery, state: FSMContext):
 @router.callback_query(Current.event, F.data == "create_test")
 async def add_test(query: CallbackQuery, state: FSMContext):
     await query.message.answer("""🛠️Выберите настройки опроса:
+📝*Имя теста* в котором вы можете отразить тему теста 
 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
+
+#todo Дозакончить настройку теста с именем теста
+@router.callback_query(Current.event, F.data == "ikb_name_for_test")
+async def add_test2(query: CallbackQuery, state: FSMContext):
+    await state.set_state(Current.setting_name)
+    await query.message.answer("📝Напишите код по которому будет осуществлен доступ к тесту, *код должен быть числом*", reply_markup=ikb_back(), parse_mode=ParseMode.MARKDOWN_V2)
 
 
 @router.callback_query(Current.event, F.data == "access_code")
@@ -91,6 +98,18 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
 async def add_test2(query: CallbackQuery, state: FSMContext):
     await state.set_state(Current.setting_time)
     await query.message.answer("🕒Выберите ограничение по времени существования теста, *выразите в минутах*", reply_markup=ikb_timer(), parse_mode=ParseMode.MARKDOWN_V2)
+
+
+@router.message(Current.setting_name, Admin())
+async def add_test3(message: Message, state: FSMContext):
+    code = message.text
+    await state.update_data(setting_name=code)
+    await message.answer(f"✅Имя теста успешно установлено <b>{code}</b>", parse_mode=ParseMode.HTML)
+    await message.answer("""🔓Код доступа по которому пользователи смогут получить доступ к тесту
+🕒Время на прохождение теста
+🕒Время существования теста""", reply_markup=ikb_settings_test())
+    await state.set_state(Current.event)
+
 
 
 @router.message(Current.setting_passing, Admin())

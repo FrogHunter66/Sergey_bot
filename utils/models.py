@@ -36,6 +36,7 @@ class Test(BaseModel):
     lifetime = db.Column(db.String)
     end_time = db.Column(db.DateTime(timezone=True))
     bound_time = db.Column(db.BigInteger)
+    name = db.Column(db.String)
 
 
 class Questions(BaseModel):

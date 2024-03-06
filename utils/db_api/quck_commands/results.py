@@ -5,17 +5,22 @@ from asyncpg import UniqueViolationError
 
 async def get_uniq_id():
     results = await get_all_results()
-    lst_results = [res for res in results.id]
+    lst_result = list()
+    for i, res in enumerate(results):
+        lst_result.append(res.id)
     lst = [m for m in range(1, 10000)]
     for key in lst:
-        if key not in lst:
+        if key not in lst_result:
             return key
     return None
 
 
 async def add_result(id_test:int, id_user:int, result:list):
     id = get_uniq_id()
-    res = Results(id=id, id_test=id_test, id_user=id_user, result=result)
+    res = ""
+    for i in result:
+        res += str(i)
+    res = Results(id=id, id_test=id_test, id_user=id_user, result=res)
     await res.create()
 
 

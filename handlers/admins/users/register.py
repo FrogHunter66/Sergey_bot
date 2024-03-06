@@ -76,9 +76,24 @@ async def first(message: Message, state: FSMContext):
 @router.callback_query(Current_lks.filter(F.cb=="ikb_lks"))
 async def take_quest(query: CallbackQuery, callback_data: Current_lks):
     id = callback_data.id
+    users_result = await results.get_all_results_id(id)
+    print(id)
+    for result in users_result:
+        pluses = (result.result).count('1')
+        minuses = (result.result).count('0')
+        await query.message.answer(f"""📋Тест номер <b>{result.id_test}</b>
+        
+🎯 Процент выполнения - <b>{pluses/(pluses+minuses)//1}</b>
+
+✅ Правильных ответов - <b>{pluses}</b>
+
+❌ Неправильных овтеты - <b>{minuses}</b>
 
 
-    await query.message.answer("Вы в личном кабинете")
+#result""", parse_mode=ParseMode.HTML)
+
+    await query.message.answer("🔓Введите код доступа к тесту, чтобы его пройти")
+
 
 
 

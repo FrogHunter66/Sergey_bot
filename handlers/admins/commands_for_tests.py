@@ -238,12 +238,8 @@ async def second(query: CallbackQuery, state: FSMContext):
     correct = data.get("correct")
     id_quest = data.get("current_quest")
     id_test = data.get("current_test")
-    print("Интересное значение", id_test)
     typee = data.get("type")
     try:
-        await questions.change_correct(id_quest=id_quest, new_correct=correct)
-        await questions.change_text(id_quest=id_quest, new_text=text)
-        await questions.change_vars(id_quest=id_quest, new_vars=variants)
         await query.message.answer("Данные успешно сохранены")
         kb = await ikb_all_questions(id_test)
         await query.message.answer("Выберите действие", reply_markup=kb)

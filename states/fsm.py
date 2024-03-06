@@ -19,6 +19,7 @@ class Current(StatesGroup):
 
     event_id = State()
     setting_code = State()
+    setting_name = State()
     setting_passing = State()
     setting_time = State()
 
