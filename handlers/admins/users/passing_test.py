@@ -1,44 +1,17 @@
 import pickle
-
 from aiogram.enums import ParseMode
-
 from bot import bot
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router, F
-from aiogram.enums.dice_emoji import DiceEmoji
-from aiogram.types import Message, InlineKeyboardButton, CallbackQuery
-from aiogram import types
-from aiogram.filters import Command
+from aiogram.types import CallbackQuery
 import datetime
-from keyboard.ikb_actions_question import ikb_actions_qustion, ikb_actions_rebuild_qustion
-from keyboard.inline_main_menu import ikb_main_menu
-from keyboard.ikb_back import ikb_back
-from keyboard.save_event import ikb_save
-from keyboard.ikb_all_events import ikb_all_events
-from filters.is_admin import Admin
-from filters.is_new_user import New_User
 from filters.Old_User import Old_user
-from utils.db_api.quck_commands import event
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
-from states.fsm import Creation, Current, Current2, User
-from keyboard.list_tests import ikb_all_tests, Choose_test
-from keyboard.ikb_current_test import ikb_current_test
-from keyboard.ikb_settings_test import ikb_settings_test
-from keyboard.ikb_timer import ikb_timer, Choose_timeer
-from keyboard.ikb_adding_questions import ikb_adding_questions
-from keyboard.ikb_types_questions import ikb_types_of_questions
-from keyboard.list_tests import ikb_all_tests
-from keyboard.ikb_rebuilding_test import ikb_rebuild
-from keyboard.list_questions import ikb_all_questions, Choose_quest
-from keyboard.users_kb.ikb_start import ikb_start
+from states.fsm import User
 from keyboard.users_kb.ikb_pass_test import ikb_pass_test, answer
 from keyboard.users_kb.ikb_choose_quests import ikb_get_all_quests, Take_quest
-from utils.db_api.quck_commands import tests, questions
-from keyboard.users_kb.ikb_start_test import ikb_start_test
-from keyboard.users_kb.ikb_back_code import ikb_back_code
-from utils.db_api.quck_commands import users
+from utils.db_api.quck_commands import questions
 from utils.db_api.quck_commands import results
+
 router = Router()
 test_result = {}
 
@@ -116,13 +89,7 @@ async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: Tak
     else:
         await query.message.answer("⏰Время на выполнение теста вышло")
         await state.clear()
-# async def edit_message_reply_markup(
-#         self,
-#         chat_id: Optional[Union[int, str]] = None,
-#         message_id: Optional[int] = None,
-#         inline_message_id: Optional[str] = None,
-#         reply_markup: Optional[InlineKeyboardMarkup] = None,
-#         request_timeout: Optional[int] = None,
+
 
 @router.callback_query(answer.filter(F.cb=="ikb_answer"), User.answer, Old_user())
 async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: answer):
@@ -131,11 +98,7 @@ async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: ans
     data = await state.get_data()
     id_quest = data.get("current_quest")
     current_quest = await questions.get_current(id_quest)
-    variants = list(map(str, current_quest.variants.split(".*.")))
-    result = str(data.get("result"))
     type_quest = current_quest.type
-
-
     if type_quest == 1:
         test_result[id_quest] = str(current_ans)
         await state.update_data(result=current_ans)
@@ -157,45 +120,19 @@ async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: ans
         mark = test_result.get(id_quest)
     except:
         mark = None
-    print("mark ", mark)
     new_kb = await ikb_pass_test(id_quest, mark)
-
-
     await bot.edit_message_reply_markup(
         chat_id=query.message.chat.id,
         message_id=query.message.message_id,
         reply_markup=new_kb,
         inline_message_id=query.inline_message_id
     )
-    print(test_result)
 
 
 @router.callback_query(User.answer, F.data=="ikb_save_answer", Old_user())
 async def save(query: CallbackQuery, state: FSMContext):
     await state.set_state(User.choose_quest)
     data = await state.get_data()
-    res = data.get("result")
-    id_quest = data.get("current_quest")
-    final = data.get("final_res")
-    if res:
-        if final:
-            ans_final = f"{id_quest}-{res},{final}"
-            await state.update_data(final_res=ans_final)
-        else:
-            ans_final = f"{id_quest}-{res}"
-            await state.update_data(final_res=ans_final)
-    else:
-        if final:
-            ans_final = f"{id_quest}-0,{final}"
-            await state.update_data(final_res=ans_final)
-        else:
-            ans_final = f"{id_quest}-0"
-            await state.update_data(final_res=ans_final)
-
-    data_new = await state.get_data()
-    #print("funal_res ", data_new.get("final_res"), "id_quest ", id_quest, "res ",  res)
-
-    await state.update_data(result="")
     id_test = data.get("current_test")
     kb = await ikb_get_all_quests(id_test)
     end_time_not_serialized = data.get("time")
@@ -207,13 +144,8 @@ async def save(query: CallbackQuery, state: FSMContext):
 🕒Время до окончания теста - <b>{differ}</b>""", reply_markup=kb, parse_mode=ParseMode.HTML)
 
 
-
-
-@router.callback_query(User.choose_quest, F.data=="ikb_finish", Old_user())
-async def save(query: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    id_test = data.get("current_test")
-    all_quests = await questions.get_questions(id_test)
+async def get_final_result(all_quests):
+    global test_result
     lst_res = list()
 
     result_pluses = 0
@@ -225,7 +157,7 @@ async def save(query: CallbackQuery, state: FSMContext):
             correct = quest.correct_answer
             variants = quest.variants
             variants = list(map(str, variants.split(".*.")))
-            num = variants.index(correct)+1
+            num = variants.index(correct) + 1
 
             if test_result.get(quest.id_quest) == str(num):
                 result_pluses += 1
@@ -240,7 +172,7 @@ async def save(query: CallbackQuery, state: FSMContext):
             variants = list(map(str, variants.split(".*.")))
             nums = list()
             for cor in correct:
-                nums.append(str(variants.index(cor)+1))
+                nums.append(str(variants.index(cor) + 1))
             try:
                 user_answers = test_result.get(quest.id_quest)
                 user_answers = [m for m in user_answers]
@@ -262,16 +194,25 @@ async def save(query: CallbackQuery, state: FSMContext):
                 lst_res.append(0)
                 result_minuses += 1
     test_result.clear()
+    return lst_res
+
+@router.callback_query(User.choose_quest, F.data=="ikb_finish", Old_user())
+async def save(query: CallbackQuery, state: FSMContext):
+    global test_result
+    data = await state.get_data()
     id_test = data.get("current_test")
-#6799017808
-    print(query.from_user.id)
+    all_quests = await questions.get_questions(id_test)
+    lst_res = await get_final_result(all_quests)
+    pluses = lst_res.count(1)
+    minuses = lst_res.count(0)
+    id_test = data.get("current_test")
     await results.add_result(id_test=id_test, id_user=query.from_user.id, result=lst_res)
     await query.message.answer(f"""📊Ваш результат: 
-✅ Правильных ответов - {result_pluses} 
+✅ Правильных ответов - {pluses} 
 
-❌ Неправильных ответов - {result_minuses}
+❌ Неправильных ответов - {minuses}
 
-🎯 Выполнения - {(result_pluses / len(all_quests) * 100)//1}
+🎯 Выполнения - {(pluses / len(all_quests) * 100)//1}
 
 
 #results""")

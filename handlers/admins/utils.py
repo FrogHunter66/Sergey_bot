@@ -220,27 +220,36 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "ikb_back", Current.setting_time2)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
-    num = data_state.get("current_test")
+    num = data_state.get("setting_name")
     name = data_state.get("event")
-    await callback.message.answer(f"⚡Выберите действие для теста номер <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
+    await callback.message.answer(f"⚡Выберите действие для теста <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
 
 
 @router.callback_query(F.data == "ikb_back", Current.setting_passing2)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
-    num = data_state.get("current_test")
+    num = data_state.get("setting_name")
     name = data_state.get("event")
-    await callback.message.answer(f"⚡Выберите действие для теста номер <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
+    await callback.message.answer(f"⚡Выберите действие для теста <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
 
 
 @router.callback_query(F.data == "ikb_back", Current.setting_code2)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
-    num = data_state.get("current_test")
+    num = data_state.get("setting_name")
     name = data_state.get("event")
-    await callback.message.answer(f"⚡Выберите действие для теста номер <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
+    await callback.message.answer(f"⚡Выберите действие для теста <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
+    await state.set_state(Current.current_test)
+
+
+@router.callback_query(F.data == "back_to_rebuild_test", Current.event)
+async def second(callback: types.CallbackQuery, state: FSMContext):
+    data_state = await state.get_data()
+    num = data_state.get("setting_name")
+    name = data_state.get("event")
+    await callback.message.answer(f"⚡Выберите действие для теста <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
 
 #-----------------------------------------------------------------
@@ -252,6 +261,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     num = data_state.get("current_test")
     name = data_state.get("event")
     await callback.message.answer("""⚙️Выберите настройки опроса:
+📝Имя теста в котором вы можете отразить тему теста 
 🔓Код доступа по которому пользователи смогут получить доступ к тесту
 🕒Время на прохождение теста
 🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
@@ -264,6 +274,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     num = data_state.get("current_test")
     name = data_state.get("event")
     await callback.message.answer("""⚙️Выберите настройки опроса:
+📝Имя теста в котором вы можете отразить тему теста 
 🔓Код доступа по которому пользователи смогут получить доступ к тесту
 🕒Время на прохождение теста
 🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
@@ -276,6 +287,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     num = data_state.get("current_test")
     name = data_state.get("event")
     await callback.message.answer("""⚙️Выберите настройки опроса:
+📝Имя теста в котором вы можете отразить тему теста 
 🔓Код доступа по которому пользователи смогут получить доступ к тесту
 🕒Время на прохождение теста
 🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())

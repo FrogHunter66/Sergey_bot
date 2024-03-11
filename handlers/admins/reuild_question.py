@@ -173,7 +173,7 @@ async def question(message: Message, state:FSMContext):
                     list_corrects = list(map(str, corrects_new.split(".*.")))
                     list_corrects = "\n".join(f"{index}) {element}" for index, element in enumerate(list_corrects, start=1))
 
-                    await message.answer(f"""️Вы в конструктуоре вопроса c <b>множественным правильным ответом</b>
+                    await message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>множественным правильным ответом</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>

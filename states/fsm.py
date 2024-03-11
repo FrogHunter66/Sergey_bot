@@ -25,6 +25,7 @@ class Current(StatesGroup):
 
     setting_code2 = State()
     setting_passing2 = State()
+    setting_name2 = State()
     setting_time2 = State()
 
     rebuild_quest = State()

@@ -79,9 +79,11 @@ async def take_quest(query: CallbackQuery, callback_data: Current_lks):
     users_result = await results.get_all_results_id(id)
     print(id)
     for result in users_result:
+        current_test = await tests.get_current(id_test=result.id_test, id_event=0)
+        name = current_test.name
         pluses = (result.result).count('1')
         minuses = (result.result).count('0')
-        await query.message.answer(f"""📋Тест номер <b>{result.id_test}</b>
+        await query.message.answer(f"""📋Тест: <b>{name}</b>
         
 🎯 Процент выполнения - <b>{pluses/(pluses+minuses)//1}</b>
 
@@ -118,10 +120,11 @@ async def start_test(message: Message, state: FSMContext):
         end_time = current_test.end_time.replace(microsecond=0)
         differ = end_time - current_time
         if current_time < end_time:
-            await message.answer(f"""Готовы ли вы приступить к началу тестирования 
-Время на прохождение теста ограниченно {current_test.lifetime}
-Время до конца существования теста - {differ}
-Количество вопросов - {len(count_quests)}""", reply_markup=ikb_start_test())
+            await message.answer(f"""🎬Готовы ли вы приступить к началу тестирования?
+📝Название теста - {current_test.name}
+🕘Время на прохождение теста ограниченно - {current_test.lifetime}
+🕘Время до конца существования теста - {differ}
+🔢Количество вопросов - {len(count_quests)}""", reply_markup=ikb_start_test(), parse_mode=ParseMode.HTML)
         else:
             await message.answer(f"⛔Тест больше не доступен. Время существования теста истекло")
     else:
@@ -146,7 +149,7 @@ async def second(query: CallbackQuery, state: FSMContext):
     serialized_time = serialize_datetime(end_time)
     await state.update_data(time=serialized_time)
     await query.message.answer("✔️Вы начали тестирование!")
-    await query.message.answer(f"Выберите вопрос", reply_markup=kb)
+    await query.message.answer(f"👉Выберите вопрос", reply_markup=kb)
 
 
 @router.callback_query(F.data == "ikb_back_code", User.test_code, Old_user())
