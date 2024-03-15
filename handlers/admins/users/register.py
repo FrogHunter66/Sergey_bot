@@ -61,6 +61,7 @@ async def first(message: Message, state: FSMContext):
     await users.add_user(id=message.from_user.id, username=message.from_user.username, first_name=message.text, last_name="", status="user")
     name = message.text
     await state.update_data(first_name=name)
+    await state.update_data(username="@" + message.from_user.username)
     await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти", reply_markup=ikb_lks(message.from_user.id))
     await state.set_state(User.test_code)
 
@@ -71,12 +72,14 @@ async def first(message: Message, state: FSMContext):
     await message.answer(f"""👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти""", parse_mode=ParseMode.HTML, reply_markup=ikb_lks(message.from_user.id))
     await state.set_state(User.test_code)
     await state.update_data(first_name=name)
+    await state.update_data(username="@" + message.from_user.username)
+
 
 
 @router.callback_query(Current_lks.filter(F.cb=="ikb_lks"))
 async def take_quest(query: CallbackQuery, callback_data: Current_lks):
     id = callback_data.id
-    users_result = await results.get_all_results_id(id)
+    users_result = await results.get_all_results_id_user(id)
     print(id)
     for result in users_result:
         current_test = await tests.get_current(id_test=result.id_test, id_event=0)

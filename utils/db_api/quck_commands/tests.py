@@ -64,3 +64,27 @@ async def update_lifetime(id_test, id_event, new_time):
 async def update_name(id_test, id_event, new_name):
     user = await get_current(id_event=id_event, id_test=id_test)
     await user.update(name=new_name).apply()
+
+
+async def add_notifications(id_test, id_admin):
+    test = await get_current(id_test=id_test, id_event=1)
+    try:
+        notifications = list(test.notifications)
+        notifications.index(id_admin)
+    except:
+        notifications = [id_admin]
+    print(notifications)
+    await test.update(notifications=notifications).apply()
+
+
+async def delete_notifications(id_test, id_admin):
+    test = await get_current(id_test=id_test, id_event=1)
+    try:
+        notifications = list(test.notifications)
+        ind = notifications.index(id_admin)
+        notifications.pop(ind)
+        print("Удалился")
+        await test.update(notifications=notifications).apply()
+    except:
+        pass
+

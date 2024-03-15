@@ -5,11 +5,14 @@ from aiogram.enums.dice_emoji import DiceEmoji
 from aiogram.types import Message, InlineKeyboardButton, CallbackQuery
 from aiogram import types
 from aiogram.filters import Command
+
+from loader import bot
 from keyboard.inline_main_menu import ikb_main_menu
 from keyboard.ikb_back import ikb_back
 from keyboard.save_event import ikb_save
 from keyboard.ikb_all_events import ikb_all_events
 from filters.is_admin import Admin
+
 from utils.db_api.quck_commands import event
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -23,9 +26,12 @@ from keyboard.ikb_types_questions import ikb_types_of_questions
 from keyboard.list_tests import ikb_all_tests
 from keyboard.ikb_delete_event import ikb_delete_event
 from keyboard.ikb_notifications_test import ikb_notifications
+from keyboard.ikb_notifications_choose import ikb_notifications_choose
 from keyboard.ikb_notifications_test import Notifications_test
-from utils.db_api.quck_commands import tests
+from utils.db_api.quck_commands import tests, results, users
 router = Router()
+
+
 
 
 @router.callback_query(Choose_event.filter(F.cb=="ikb_choose"))
@@ -37,17 +43,82 @@ async def second(query: CallbackQuery, callback_data: Choose_event, state: FSMCo
     await state.update_data(event_id=callback_data.id)
     await state.update_data(event=name)
 
-#todo Здесь я остановился
-@router.callback_query(F.data == "get_stat")
-async def second(query: CallbackQuery, callback_data: Choose_event, state: FSMContext):
-    data = await event.get_event(callback_data.id)
-    event_id = data.id_event
-    kb = await ikb_notifications(id_event=event_id)
 
+@router.callback_query(F.data == "get_stat", Current.event)
+async def second(query: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    id_event = data.get("event_id")
+    kb = await ikb_notifications(id_event=id_event)
     await query.message.answer(f"""🔔Вы в панели настройки уведомлений о прохождении тестов
 Выберите тест для настройки получения уведомлений от бота при прохождении теста.
-По умолчанию уведомления выключены и все результаты просматриваются по нажатию на кнопку с названием теста""", reply_markup=kb)
+<b>По умолчанию уведомления выключены</b> и все результаты просматриваются по нажатию на кнопку с названием теста""", reply_markup=kb, parse_mode=ParseMode.HTML)
 
+
+@router.callback_query(Notifications_test.filter(F.cb=="ikb_notifications"), Current.event)
+async def second(query: CallbackQuery, callback_data: Notifications_test, state: FSMContext):
+    test = await tests.get_current(id_test=callback_data.id, id_event=0)
+    await state.update_data(current_test=callback_data.id)
+    kb = await ikb_notifications_choose(query.from_user.id, callback_data.id)
+    await query.message.answer(f"""Выберите настройку уведомлений о прохождении теста {test.name}""", reply_markup=kb)
+
+
+@router.callback_query(F.data == "ikb_check_results_admin", Current.event)
+async def check_reuslts_admin(query: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    id_test = data.get("current_test")
+    current_test = await tests.get_current(id_test=id_test, id_event=1)
+    res = await results.get_all_results_id_test(id_test)
+    for result in res:
+        current = [m for m in result.result]
+        print(current)
+        pluses = current.count("1")
+        minuses = current.count("0")
+        user = await users.get_current_user(result.id_user)
+        name = user.first_name
+        username = "@" + user.username
+        await query.message.answer(f"""📊Результат пользователя <b>{username if username else "Неопознанно"}</b>
+
+Имя <b>{name}</b>
+
+Тест <b>{current_test.name}</b>:
+
+✅ Правильных ответов - {pluses}
+    
+❌ Неправильных ответов - {minuses}
+    
+🎯 Выполнение - {(pluses / len(current) * 100) // 1} %
+    
+    
+#results""", parse_mode=ParseMode.HTML)
+
+
+@router.callback_query(F.data == "ikb_send", Current.event)
+async def check_reuslts_admin(query: CallbackQuery, state: FSMContext):
+    admin_id = query.from_user.id
+    data = await state.get_data()
+    id_test = data.get("current_test")
+    await tests.add_notifications(id_test,admin_id)
+    new_kb = await ikb_notifications_choose(query.from_user.id, id_test)
+    await bot.edit_message_reply_markup(
+        chat_id=query.message.chat.id,
+        message_id=query.message.message_id,
+        reply_markup=new_kb,
+        inline_message_id=query.inline_message_id
+    )
+
+@router.callback_query(F.data == "ikb_dont_send", Current.event)
+async def check_reuslts_admin(query: CallbackQuery, state: FSMContext):
+    admin_id = query.from_user.id
+    data = await state.get_data()
+    id_test = data.get("current_test")
+    await tests.delete_notifications(id_test, admin_id)
+    new_kb = await ikb_notifications_choose(query.from_user.id, id_test)
+    await bot.edit_message_reply_markup(
+        chat_id=query.message.chat.id,
+        message_id=query.message.message_id,
+        reply_markup=new_kb,
+        inline_message_id=query.inline_message_id
+    )
 
 #-------------------------------------- Удаляем мероприятие -------------------------------
 

@@ -31,8 +31,19 @@ async def add_result(id_test:int, id_user:int, result:list):
 #             print("test - ", event)
 #             return event
 #     return 0
-#
-async def get_all_results_id(id):
+
+
+async def get_all_results_id_test(id):
+    lst = list()
+    results = await get_all_results()
+    for i, res in enumerate(results):
+        if res.id_test == id:
+            lst.append(res)
+    return lst
+
+
+
+async def get_all_results_id_user(id):
     lst = list()
     results = await get_all_results()
     for i, res in enumerate(results):
@@ -45,17 +56,3 @@ async def get_all_results():
     events = await Results.query.gino.all()
     return events
 
-#
-# async def update_code(id_test, id_event, new_code):
-#     user = await get_current(id_event=id_event, id_test=id_test)
-#     await user.update(token=int(new_code)).apply()
-#
-#
-# async def update_bound_time(id_test, id_event, new_time):
-#     user = await get_current(id_event=id_event, id_test=id_test)
-#     await user.update(bound_time=int(new_time)).apply()
-#
-#
-# async def update_lifetime(id_test, id_event, new_time):
-#     user = await get_current(id_event=id_event, id_test=id_test)
-#     await user.update(lifetime=new_time).apply()

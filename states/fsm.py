@@ -74,3 +74,4 @@ class User(StatesGroup):
 
     final_res = State()
     result = State()
+

@@ -9,7 +9,7 @@ from aiogram.fsm.context import FSMContext
 from states.fsm import User
 from keyboard.users_kb.ikb_pass_test import ikb_pass_test, answer
 from keyboard.users_kb.ikb_choose_quests import ikb_get_all_quests, Take_quest
-from utils.db_api.quck_commands import questions
+from utils.db_api.quck_commands import questions, users, tests
 from utils.db_api.quck_commands import results
 
 router = Router()
@@ -205,14 +205,34 @@ async def save(query: CallbackQuery, state: FSMContext):
     lst_res = await get_final_result(all_quests)
     pluses = lst_res.count(1)
     minuses = lst_res.count(0)
-    id_test = data.get("current_test")
     await results.add_result(id_test=id_test, id_user=query.from_user.id, result=lst_res)
+    test = await tests.get_current(id_event=1, id_test=id_test)
+    if test.notifications:
+        for admin in test.notifications:
+            await bot.send_message(chat_id=admin, text=f"""📊Результат пользователя <b>{data.get("username") if data.get("username") else "Неопознанно"}</b>
+
+Имя <b>{data.get("first_name")}</b>
+
+Тест <b>{test.name}</b>:
+
+✅ Правильных ответов - {pluses}
+    
+❌ Неправильных ответов - {minuses}
+    
+🎯 Выполнение - {(pluses / len(all_quests) * 100) // 1} %
+    
+    
+#results""", parse_mode=ParseMode.HTML)
+
+
+
     await query.message.answer(f"""📊Ваш результат: 
+
 ✅ Правильных ответов - {pluses} 
 
 ❌ Неправильных ответов - {minuses}
 
-🎯 Выполнения - {(pluses / len(all_quests) * 100)//1}
+🎯 Выполнения - {(pluses / len(all_quests) * 100)//1} %
 
 
 #results""")

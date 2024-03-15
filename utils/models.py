@@ -37,6 +37,7 @@ class Test(BaseModel):
     end_time = db.Column(db.DateTime(timezone=True))
     bound_time = db.Column(db.BigInteger)
     name = db.Column(db.String)
+    notifications = db.Column(db.ARRAY(db.BigInteger))
 
 
 class Questions(BaseModel):
@@ -58,6 +59,7 @@ class User(BaseModel):
     last_name = db.Column(db.String)
     events = db.Column(db.ARRAY(db.BigInteger))
     status = db.Column(db.String)
+
 
 
 class Results(BaseModel):
