@@ -59,6 +59,8 @@ async def second(callback: types.CallbackQuery, state:FSMContext):
     key = await get_unique_key(keys)
 
     try:
+
+
         await event.add_event(id_event=key, name=str(data.get('name_event')))
         await state.clear()
         await callback.message.answer("✅Успешно добавлено мероприятие", reply_markup=ikb_back())
