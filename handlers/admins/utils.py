@@ -64,7 +64,16 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Current.event)
 
 
+#-------------------------------------------------------------------------------
 
+@router.callback_query(F.data == "ikb_back_to_notifications", Current.event)
+async def second(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    name = data.get("event_name")
+    await callback.message.answer(f"⚡ Выберите действие для мероприятия <b>{name}</b>", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+
+
+#-------------------------------------------------------------------------------
 @router.callback_query(F.data == "ikb_back_choose_questionnn", Current.event)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Current.current_test)

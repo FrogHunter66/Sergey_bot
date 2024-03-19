@@ -17,6 +17,7 @@ async def ikb_notifications_choose(id_admin, id_test):
     except:
         btn1 = InlineKeyboardButton(text="📈Просмотреть результаты", callback_data="ikb_check_results_admin")
         btn2 = InlineKeyboardButton(text="Присылать результаты", callback_data="ikb_send")
-        btn3 = InlineKeyboardButton(text="✔️Не получать результаты", callback_data="ikb_dont_send")
+        btn3 = InlineKeyboardButton(text="✔️Не получать результаты", callback_data="ikb_dont_send") #todo Допилить 2 бэка осталось
         builder = InlineKeyboardMarkup(inline_keyboard=[[btn1], [btn2], [btn3]])
         return builder
+

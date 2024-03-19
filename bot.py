@@ -16,9 +16,9 @@ bot = Bot(token=TELEGRAM_TOKEN)
 async def set_commands(bot: Bot):
     commands = [
         BotCommand(
-            command='start',
-            description='Начало работы'
-        )
+            command='start', description='Начало работы'
+        ),
+        BotCommand(command="buy", description="Приобрести возможность создавать тесты")
     ]
     await bot.set_my_commands(commands, BotCommandScopeDefault())
 

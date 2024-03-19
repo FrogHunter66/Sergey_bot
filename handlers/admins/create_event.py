@@ -32,7 +32,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "get_events")
 async def second(callback: types.CallbackQuery):
-    ikb = await ikb_all_events()
+    ikb = await ikb_all_events(callback.from_user.id)
     await callback.message.answer('📅Доступные мероприятия', reply_markup=ikb)
 
 

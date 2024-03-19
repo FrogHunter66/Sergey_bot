@@ -10,9 +10,11 @@ async def get_all_admins():
            lst.append(user)
     return lst
 
+
 async def get_all_users():
     users = await User.query.gino.all()
     return users
+
 
 async def get_current_user(id):
     users = await get_all_users()
@@ -20,6 +22,7 @@ async def get_current_user(id):
         if user.id == id:
             return user
     return 0
+
 
 async def add_user(id:int, username, first_name, last_name, status):
 
