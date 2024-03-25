@@ -65,6 +65,8 @@ async def second(callback: types.CallbackQuery, state:FSMContext):
 
     admin = await users.get_current_user(callback.from_user.id)
     try:
+
+
         await event.add_event(id_event=key, name=str(data.get('name_event')))
         await state.clear()
         await callback.message.answer(f"✅Успешно добавлено мероприятие. Осталось досутпных мероприятий {}", reply_markup=ikb_back())

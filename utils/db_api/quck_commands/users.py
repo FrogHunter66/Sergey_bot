@@ -28,6 +28,10 @@ async def add_user(id:int, username, first_name, last_name, status):
     test = User(id=id, username=username, first_name=first_name, last_name=last_name, status=status)
     await test.create()
 
-
+async def update_status(id_user, new_status):
+    user = await get_current_user(id_user)
+    lst = list(user.events)
+    lst.append(new_status)
+    await user.update(events=lst).apply()
 
 
