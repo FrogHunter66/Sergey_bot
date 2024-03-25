@@ -73,7 +73,6 @@ async def add_notifications(id_test, id_admin):
         notifications.index(id_admin)
     except:
         notifications = [id_admin]
-    print(notifications)
     await test.update(notifications=notifications).apply()
 
 
@@ -83,7 +82,6 @@ async def delete_notifications(id_test, id_admin):
         notifications = list(test.notifications)
         ind = notifications.index(id_admin)
         notifications.pop(ind)
-        print("Удалился")
         await test.update(notifications=notifications).apply()
     except:
         pass

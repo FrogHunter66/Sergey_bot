@@ -59,6 +59,9 @@ class User(BaseModel):
     last_name = db.Column(db.String)
     events = db.Column(db.ARRAY(db.BigInteger))
     status = db.Column(db.String)
+    data_end = db.Column(db.DateTime(timezone=True))
+    c_events = db.Column(db.BigInteger)
+    c_tests = db.Column(db.BigInteger)
 
 
 

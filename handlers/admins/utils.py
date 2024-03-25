@@ -22,7 +22,6 @@ from aiogram.fsm.context import FSMContext
 from states.fsm import Current, Current2
 from aiogram.fsm.state import StatesGroup, State
 router = Router()
-#todo Прописать все бэки
 
 
 
@@ -34,7 +33,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "ikb_back_list_events", Current.event)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
-    ikb = await ikb_all_events()
+    ikb = await ikb_all_events(callback.from_user.id)
     await callback.message.answer('📅Список доступных мероприятий', reply_markup=ikb)
 
 

@@ -68,6 +68,9 @@ async def check_reuslts_admin(query: CallbackQuery, state: FSMContext):
     id_test = data.get("current_test")
     current_test = await tests.get_current(id_test=id_test, id_event=1)
     res = await results.get_all_results_id_test(id_test)
+    if not res:
+        await query.message.answer("❌Тест пока не был никем пройден")
+
     for result in res:
         current = [m for m in result.result]
         print(current)
@@ -160,7 +163,6 @@ async def add_test(query: CallbackQuery, state: FSMContext):
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
 
-#todo Дозакончить настройку теста с именем теста
 @router.callback_query(Current.event, F.data == "ikb_name_for_test")
 async def add_test2(query: CallbackQuery, state: FSMContext):
     await state.set_state(Current.setting_name)

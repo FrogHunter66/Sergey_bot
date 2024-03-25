@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
-
+PAYMENTS_TOKEN = str(os.getenv("PAYMENTS_TOKEN"))
 TELEGRAM_TOKEN = str(os.getenv('TOKEN'))
 PG_USER= str(os.getenv('PG_USER'))
 PG_PASSWORD = str(os.getenv('PG_PASSWORD'))

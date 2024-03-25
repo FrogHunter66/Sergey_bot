@@ -15,7 +15,7 @@ async def ikb_all_events(user_id):
     user = await users.get_current_user(user_id)
     events = await event.get_all_events()
     lst = list()
-    if user.status == "admin_buy":
+    if user.status == "admin_b":
         event_admin = list(user.events)
         for ev_id in event_admin:
             current = await event.select_event(ev_id)

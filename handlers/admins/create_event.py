@@ -10,7 +10,7 @@ from keyboard.ikb_back import ikb_back
 from keyboard.save_event import ikb_save
 from keyboard.ikb_all_events import ikb_all_events, Choose_event
 from filters.is_admin import Admin
-from utils.db_api.quck_commands import event
+from utils.db_api.quck_commands import event, users
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from states.fsm import Creation
@@ -26,8 +26,12 @@ async def first(message: Message):
 
 @router.callback_query(F.data == "create_event")
 async def second(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer("📝Напишите название мероприятия", reply_markup=ikb_back())
-    await state.set_state(Creation.name_event)
+    admin = await users.get_current_user(callback.from_user.id)
+    if admin.c_events > 0:
+        await callback.message.answer(f"📝Напишите название мероприятия. Доступно <b>{admin.c_events}</b> мероприятий для создания", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
+        await state.set_state(Creation.name_event)
+    else:
+        await callback.message.answer(f"")#TODO недоделал тут проверку на колчиество доступных мероприятий. решить вопрос со статусом admin_b
 
 
 @router.callback_query(F.data == "get_events")
@@ -40,7 +44,8 @@ async def second(callback: types.CallbackQuery):
 async def name_event(message: Message, state: FSMContext):
     name = message.text
     await state.update_data(name_event=name)
-    await message.answer(f"💾Сохранить мероприятие с названием <b>{name}</b> ?", reply_markup=ikb_save(), parse_mode=ParseMode.HTML)
+    await message.answer(f"💾Сохранить мероприятие с названием <b>{name}</b>?", reply_markup=ikb_save(), parse_mode=ParseMode.HTML)
+
 
 async def get_unique_key(keys):
     for i in range(1000):
@@ -58,10 +63,11 @@ async def second(callback: types.CallbackQuery, state:FSMContext):
 
     key = await get_unique_key(keys)
 
+    admin = await users.get_current_user(callback.from_user.id)
     try:
         await event.add_event(id_event=key, name=str(data.get('name_event')))
         await state.clear()
-        await callback.message.answer("✅Успешно добавлено мероприятие", reply_markup=ikb_back())
+        await callback.message.answer(f"✅Успешно добавлено мероприятие. Осталось досутпных мероприятий {}", reply_markup=ikb_back())
     except Exception as err:
         await callback.message.answer("❌Ошибка сохранения", reply_markup=ikb_back())
         await state.clear()
