@@ -68,17 +68,17 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
 <b>Текущее имя</b> {current_name}""", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
 
 
-@router.callback_query(Current.current_test, F.data == "access_code")
-async def add_test2(query: CallbackQuery, state: FSMContext):
-    await state.set_state(Current.setting_code2)
-    data = await state.get_data()
-    id_ev = data.get("event_id")
-    id_test = data.get("current_test")
-    test = await tests.get_current(id_test=id_test, id_event=id_ev)
-    current_code = test.token
-    await query.message.answer(f"""🔓Напишите код по которому будет осуществлен доступ к тесту
-<b>Текущий код</b> {current_code}""", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
-
+# @router.callback_query(Current.current_test, F.data == "access_code")
+# async def add_test2(query: CallbackQuery, state: FSMContext):
+#     await state.set_state(Current.setting_code2)
+#     data = await state.get_data()
+#     id_ev = data.get("event_id")
+#     id_test = data.get("current_test")
+#     test = await tests.get_current(id_test=id_test, id_event=id_ev)
+#     current_code = test.token
+#     await query.message.answer(f"""🔓Напишите код по которому будет осуществлен доступ к тесту
+# <b>Текущий код</b> {current_code}""", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
+#
 
 @router.callback_query(Current.current_test, F.data == "time_to_answer")
 async def add_test2(query: CallbackQuery, state: FSMContext):
@@ -116,14 +116,12 @@ async def add_test3(message: Message, state: FSMContext):
         await state.set_state(Current.current_test)
         await message.answer(f"✅Время на прохождения теста успешно установленно *{code}*", parse_mode=ParseMode.MARKDOWN_V2)
         await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
-🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
     except:
         await state.set_state(Current.current_test)
         await message.answer("❌Время может быть *только численнного* формата", parse_mode=ParseMode.MARKDOWN_V2)
         await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
-🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
 
@@ -136,57 +134,56 @@ async def add_test3(message: Message, state: FSMContext):
     await tests.update_name(id_test=id_test, id_event=1, new_name=code)
     await message.answer(f"✅Имя теста успешно установлено <b>{code}</b>", parse_mode=ParseMode.HTML)
     await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
-🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
     await state.set_state(Current.event)
 
-
 @router.message(Current.setting_code2, Admin())
-async def add_test3(message: Message, state: FSMContext):
-    code = message.text
-    data = await state.get_data()
-    id_ev = data.get("event_id")
-    test_id = data.get("current_test")
-    try:
-        code = int(code)
-        if code > 0:
-            is_unique = True
-            data_tests = await tests.get_all_tests()
-            for test in data_tests:
-                print(test.token)
-                if test.token == code:
-                    is_unique = False
-                    break
-            if is_unique:
-                code = int(code)
-                print(test_id)
-                await tests.update_code(id_event=id_ev, id_test=test_id, new_code=code)
-                await message.answer(f"✅Код доступа к тесту успешно установлен {code}", parse_mode=ParseMode.MARKDOWN_V2)
-                await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
-🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
-🕒*Время на прохождение* теста
-🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
-            else:
-                await message.answer("❌Данный код доступа *уже используется в другом тесте*, напишите другой код", parse_mode=ParseMode.MARKDOWN_V2)
-                await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
-🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
-🕒*Время на прохождение* теста
-🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
-        else:
-            await message.answer("🔓Код доступа должен быть *натуральным числом*", parse_mode=ParseMode.MARKDOWN_V2)
-            await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
-🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
-🕒*Время на прохождение* теста
-🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
-        await state.set_state(Current.current_test)
-    except:
-        await state.set_state(Current.current_test)
-        await message.answer("🔓Код доступа может быть *только численнного формата*", parse_mode=ParseMode.MARKDOWN_V2)
-        await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
-🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
-🕒*Время на прохождение* теста
-🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
+# async def add_test3(message: Message, state: FSMContext):
+#     code = message.text
+#     data = await state.get_data()
+#     id_ev = data.get("event_id")
+#     test_id = data.get("current_test")
+#     try:
+#         code = int(code)
+#         if code > 0:
+#             is_unique = True
+#             data_tests = await tests.get_all_tests()
+#             for test in data_tests:
+#                 print(test.token)
+#                 if test.token == code:
+#                     is_unique = False
+#                     break
+#             if is_unique:
+#                 code = int(code)
+#                 print(test_id)
+#                 await tests.update_code(id_event=id_ev, id_test=test_id, new_code=code)
+#                 await message.answer(f"✅Код доступа к тесту успешно установлен {code}", parse_mode=ParseMode.MARKDOWN_V2)
+#                 await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
+# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
+# 🕒*Время на прохождение* теста
+# 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
+#             else:
+#                 await message.answer("❌Данный код доступа *уже используется в другом тесте*, напишите другой код", parse_mode=ParseMode.MARKDOWN_V2)
+#                 await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
+# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
+# 🕒*Время на прохождение* теста
+# 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
+#         else:
+#             await message.answer("🔓Код доступа должен быть *натуральным числом*", parse_mode=ParseMode.MARKDOWN_V2)
+#             await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
+# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
+# 🕒*Время на прохождение* теста
+# 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
+#         await state.set_state(Current.current_test)
+#     except:
+#         await state.set_state(Current.current_test)
+#         await message.answer("🔓Код доступа может быть *только численнного формата*", parse_mode=ParseMode.MARKDOWN_V2)
+#         await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
+# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
+# 🕒*Время на прохождение* теста
+# 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2
+# )
 
 
 @router.callback_query(Current.setting_time2, Choose_timeer.filter(F.cb=="ikb_time"))
@@ -198,7 +195,6 @@ async def add_test2(query: CallbackQuery, state: FSMContext, callback_data: Choo
     await tests.update_lifetime(id_event=id_ev, id_test=test_id, new_time=callback_data.id)
     await query.message.answer(f"✅Время существования теста успешно установленно {callback_data.id}", parse_mode=ParseMode.MARKDOWN_V2)
     await query.message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
-🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
     await state.set_state(Current.current_test)

@@ -1,4 +1,5 @@
 from aiogram.enums import ParseMode
+import datetime
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router, F
 from aiogram.enums.dice_emoji import DiceEmoji
@@ -10,7 +11,7 @@ from keyboard.ikb_back import ikb_back
 from keyboard.save_event import ikb_save
 from keyboard.ikb_all_events import ikb_all_events, Choose_event
 from filters.is_admin import Admin
-from utils.db_api.quck_commands import event, users
+from utils.db_api.quck_commands import event, users, admins
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from states.fsm import Creation
@@ -24,6 +25,22 @@ async def first(message: Message):
     await message.answer("👋Приветствую, админ, выбери действие", reply_markup=ikb_main_menu(), parse_mode=ParseMode.HTML)
 
 
+@router.callback_query(F.data == "tariff_info")
+async def second(callback: types.CallbackQuery):
+    admin = await users.get_current_user(callback.from_user.id)
+    ev = admin.c_events
+    tests = admin.c_tests
+    date = (admin.data_end).strftime('%Y-%m-%d')
+    print(type(date))
+    await callback.message.answer(f"""Доступных мероприятий осталось - <b>{ev}</b>
+Доустпных тестов осталось - <b>{tests}</b>
+Время действия тарифа до - <b>{date}</b>
+
+Для продления подписки вы можете оплатить новый пакет с помощью команды /buy""", parse_mode=ParseMode.HTML, reply_markup=ikb_back())
+
+
+
+
 @router.callback_query(F.data == "create_event")
 async def second(callback: types.CallbackQuery, state: FSMContext):
     admin = await users.get_current_user(callback.from_user.id)
@@ -31,7 +48,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.answer(f"📝Напишите название мероприятия. Доступно <b>{admin.c_events}</b> мероприятий для создания", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
         await state.set_state(Creation.name_event)
     else:
-        await callback.message.answer(f"")#TODO недоделал тут проверку на колчиество доступных мероприятий. решить вопрос со статусом admin_b
+        await callback.message.answer(f"⛔ У вас закончились доступные мероприятия", reply_markup=ikb_back())
 
 
 @router.callback_query(F.data == "get_events")
@@ -60,16 +77,15 @@ async def second(callback: types.CallbackQuery, state:FSMContext):
     keys = list()
     for e in all_events:
         keys.append(int(e.id_event))
-
     key = await get_unique_key(keys)
-
     admin = await users.get_current_user(callback.from_user.id)
     try:
-
-
         await event.add_event(id_event=key, name=str(data.get('name_event')))
+        await admins.add_event(callback.from_user.id, key)
+
         await state.clear()
-        await callback.message.answer(f"✅Успешно добавлено мероприятие. Осталось досутпных мероприятий {}", reply_markup=ikb_back())
+        await admins.decrement_events(callback.from_user.id)
+        await callback.message.answer(f"✅Успешно добавлено мероприятие. Осталось досутпных мероприятий <b>{admin.c_events - 1}</b>", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
     except Exception as err:
         await callback.message.answer("❌Ошибка сохранения", reply_markup=ikb_back())
         await state.clear()

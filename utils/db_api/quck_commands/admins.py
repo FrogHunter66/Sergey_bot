@@ -1,3 +1,5 @@
+import users as users
+from aiogram.enums import ParseMode
 from aiogram.types import Message
 
 from utils.models import Event, db, User
@@ -5,20 +7,14 @@ from loader import bot
 from asyncpg import UniqueViolationError
 from utils.db_api.quck_commands import users
 import datetime
-# etting_time = "15123123m"
-# print(setting_time[:-1])
-# current_time = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
-# time = current_time.replace(tzinfo=datetime.timezone.utc)
-# end_time = current_time + datetime.timedelta(hours=33)
-# print(time, current_time)
 
 
-#
-# current_time = datetime.datetime.utcnow()
-# current_time = current_time.replace(tzinfo=datetime.timezone.utc, microsecond=0)
-# end_time = current_test.end_time.replace(microsecond=0)
-# differ = end_time - current_time
-# if current_time < end_time:
+async def mail_to_admins(response):
+    admins = await users.get_all_admins()
+    for adm in admins:
+        await bot.send_message(adm.id, f"""🔔Уведомление об успешной покупке тарифа по пакету: <b>{response[0]}</b>
+На сумму <b>{response[1]}</b>""", parse_mode=ParseMode.HTML)
+
 
 
 async def successful_pay(message: Message, package:list):
@@ -42,9 +38,11 @@ async def successful_pay(message: Message, package:list):
             await user.update(data_end=current).apply()
             await user.update(c_events=package[0]).apply()
             await user.update(c_tests=package[1]).apply()
-        if user.status !='admin_b':
-            await user.update(status="admin_b").apply()
+        if user.status == "user":
+            await user.update(status="admin_buy").apply()
         return True
+
+
     except Exception as err:
         await bot.send_message(message.from_user.id, f"⛔ К сожалению произошла ошибка, обратитесь к администрации")
         print(err) #todo Добавить объявление и информацию по поводу события
@@ -55,3 +53,13 @@ async def decrement_events(id_user):
     user = await users.get_current_user(id_user)
     ev = user.c_events
     await user.update(c_events=ev - 1).apply()
+
+async def add_event(id_user, id_event):
+    admin = await users.get_current_user(id_user)
+    if admin.events:
+        lst = list(map(int, admin.events.split()))
+        lst.append(id_event)
+        await admin.update(events=lst).apply()
+    else:
+        lst = [id_event]
+        await admin.update(events=lst).apply()

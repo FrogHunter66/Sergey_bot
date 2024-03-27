@@ -26,6 +26,7 @@ class Event(BaseModel):
 
     id_event = db.Column(db.BigInteger, primary_key=True, nullable=False)
     event_name = db.Column(db.String)
+    password = db.Column(db.String)
 
 
 class Test(BaseModel):

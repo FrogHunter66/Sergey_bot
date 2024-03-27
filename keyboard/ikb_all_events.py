@@ -15,7 +15,12 @@ async def ikb_all_events(user_id):
     user = await users.get_current_user(user_id)
     events = await event.get_all_events()
     lst = list()
-    if user.status == "admin_b":
+    if user.events == None:
+        btn3 = (InlineKeyboardButton(text="↩️Назад", callback_data=f"ikb_back"))
+        builder = InlineKeyboardMarkup(inline_keyboard=[[btn3]])
+        return builder
+
+    if user.status == "admin_buy":
         event_admin = list(user.events)
         for ev_id in event_admin:
             current = await event.select_event(ev_id)

@@ -15,13 +15,11 @@ async def ikb_pass_test(id_quest, mark):
     events = await questions.get_current(id_quest)
     all_variants = events.variants
     variants = list(map(str, all_variants.split(".*.")))
-#todo сделать каждую кнопку с новой строки
     lst = list()
     for i, var in enumerate(variants):
         cb = answer(cb="ikb_answer", id=i + 1).pack()
         if mark:
             lst_mark = [m for m in mark]
-            print(lst_mark)
             if str(i+1) in lst_mark:
                 btn1 = InlineKeyboardButton(text=f"{i + 1}-й ответ ✔",
                                             callback_data=cb)

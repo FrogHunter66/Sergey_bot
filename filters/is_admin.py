@@ -9,6 +9,6 @@ class Admin(BaseFilter):
         id = message.from_user.id
         all_users = (await users.get_all_users())
         for i in range(len(all_users)):
-            if id == all_users[i].id and all_users[i].status == "admin":
+            if id == all_users[i].id and (all_users[i].status == "admin" or all_users[i].status == "admin_buy"):
                 return True
         return False

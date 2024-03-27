@@ -62,14 +62,14 @@ async def first(message: Message, state: FSMContext):
     name = message.text
     await state.update_data(first_name=name)
     await state.update_data(username="@" + message.from_user.username)
-    await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти", reply_markup=ikb_lks(message.from_user.id))
+    await message.answer(f"👋Привет, {name}, напишите код доступа к мероприятию, чтобы получить доступ к тестам", reply_markup=ikb_lks(message.from_user.id))
     await state.set_state(User.test_code)
 
 @router.message(Command("start"), Old_user())
 async def first(message: Message, state: FSMContext):
     user = await users.get_current_user(message.from_user.id)
     name = user.first_name
-    await message.answer(f"""👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти""", parse_mode=ParseMode.HTML, reply_markup=ikb_lks(message.from_user.id))
+    await message.answer(f"""👋Привет, {name}, напишите код доступа к мероприятию, чтобы получить доступ к тестам""", parse_mode=ParseMode.HTML, reply_markup=ikb_lks(message.from_user.id))
     await state.set_state(User.test_code)
     await state.update_data(first_name=name)
     await state.update_data(username="@" + message.from_user.username)
@@ -80,13 +80,14 @@ async def first(message: Message, state: FSMContext):
 async def take_quest(query: CallbackQuery, callback_data: Current_lks):
     id = callback_data.id
     users_result = await results.get_all_results_id_user(id)
-    print(id)
     for result in users_result:
         current_test = await tests.get_current(id_test=result.id_test, id_event=0)
         name = current_test.name
+        ev = await event.get_event(id=current_test.id_event)
         pluses = (result.result).count('1')
         minuses = (result.result).count('0')
-        await query.message.answer(f"""📋Тест: <b>{name}</b>
+        await query.message.answer(f"""Мероприятие: <b>{ev.name}</b>
+📋Тест: <b>{name}</b>
         
 🎯 Процент выполнения - <b>{pluses/(pluses+minuses)//1}</b>
 
@@ -97,7 +98,7 @@ async def take_quest(query: CallbackQuery, callback_data: Current_lks):
 
 #result""", parse_mode=ParseMode.HTML)
 
-    await query.message.answer("🔓Введите код доступа к тесту, чтобы его пройти")
+    await query.message.answer("🔓Введите код доступа к мероприятию, чтобы получить доступ к тестам")
 
 
 
@@ -106,14 +107,14 @@ async def take_quest(query: CallbackQuery, callback_data: Current_lks):
 async def start_test(message: Message, state: FSMContext):
     data = await state.get_data()
     code = message.text
-    all_tests = await tests.get_all_tests()
+    all_events = await event.get_all_events()
     flag = False
-    for i_test in all_tests:
-        if str(i_test.token) == str(code):
-            await state.update_data(current_test=i_test.id_test)
+    for ev in all_events:
+        if str(ev.password) == str(code):
+            await state.update_data(current_event=ev.id_event)
             flag = True
             break
-    if flag:
+    if flag: #todo Вывесить список вопросов
         data = await state.get_data()
         id_test = data.get("current_test")
         current_test = await tests.get_current(1, id_test=id_test)

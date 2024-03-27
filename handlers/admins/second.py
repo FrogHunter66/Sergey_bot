@@ -1,3 +1,4 @@
+from aiogram.enums import ParseMode
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router, F
 from aiogram.enums.dice_emoji import DiceEmoji

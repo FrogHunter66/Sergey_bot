@@ -68,6 +68,7 @@ class User(StatesGroup):
 
     answer = State()
     current_test = State()
+    current_event = State()
     current_quest = State()
     choose_quest = State()
     time = State()

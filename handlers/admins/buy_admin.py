@@ -94,5 +94,7 @@ async def successful_payment(message:Message):
     print("INFO - ", packages[int(payment_info.invoice_payload)])
     response = await admins.successful_pay(message=message, package=packages[int(payment_info.invoice_payload)])
     if response:
-        await bot.send_message(message.chat.id, f"Платеж на сумму {message.successful_payment.total_amount // 100} {message.successful_payment.currency} прошел успешно!!!")
+        await bot.send_message(message.chat.id, f"Платеж на сумму {message.successful_payment.total_amount // 100} {message.successful_payment.currency} прошел успешно")
+        resp = [payment_info.invoice_payload, message.successful_payment.total_amount // 100]
+        await admins.mail_to_admins(resp)
 
