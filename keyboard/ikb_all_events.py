@@ -35,6 +35,7 @@ async def ikb_all_events(user_id):
             btn1 = InlineKeyboardButton(text=i.event_name,
                                         callback_data=cb)
             lst.append(btn1)
+    lst1 = [[m] for m in lst]
     btn3 = (InlineKeyboardButton(text="↩️Назад", callback_data=f"ikb_back"))
-    builder = InlineKeyboardMarkup(inline_keyboard=[lst, [btn3]])
+    builder = InlineKeyboardMarkup(inline_keyboard=[*lst1, [btn3]])
     return builder

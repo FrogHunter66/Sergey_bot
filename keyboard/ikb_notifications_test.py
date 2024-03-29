@@ -18,6 +18,6 @@ async def ikb_notifications(id_event):
         cb = Notifications_test(cb="ikb_notifications", id=event.id_test).pack()
         btn1 = InlineKeyboardButton(text=f"{event.id_test+1} - й тест", callback_data=cb)
         lst.append(btn1)
-    btn3 = (InlineKeyboardButton(text="↩️Назад", callback_data=f"ikb_back_to_notifications")) #todo бэка нет
+    btn3 = (InlineKeyboardButton(text="↩️Назад", callback_data=f"ikb_back_to_notifications"))
     builder = InlineKeyboardMarkup(inline_keyboard=[lst, [btn3]])
     return builder

@@ -138,7 +138,7 @@ async def add_test3(message: Message, state: FSMContext):
 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
     await state.set_state(Current.event)
 
-@router.message(Current.setting_code2, Admin())
+#@router.message(Current.setting_code2, Admin())
 # async def add_test3(message: Message, state: FSMContext):
 #     code = message.text
 #     data = await state.get_data()

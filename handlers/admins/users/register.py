@@ -22,11 +22,11 @@ from aiogram.fsm.state import StatesGroup, State
 from states.fsm import Creation, Current, Current2, User
 from keyboard.list_tests import ikb_all_tests, Choose_test
 from keyboard.ikb_current_test import ikb_current_test
+from keyboard.users_kb.ikb_get_all_tests import pick_a_test_user, ikb_all_tests_event_user
 from keyboard.ikb_settings_test import ikb_settings_test
 from keyboard.ikb_timer import ikb_timer, Choose_timeer
 from keyboard.ikb_adding_questions import ikb_adding_questions
 from keyboard.ikb_types_questions import ikb_types_of_questions
-from keyboard.list_tests import ikb_all_tests
 from keyboard.ikb_rebuilding_test import ikb_rebuild
 from keyboard.list_questions import ikb_all_questions, Choose_quest
 from keyboard.users_kb.ikb_start import ikb_start
@@ -38,6 +38,9 @@ from utils.db_api.quck_commands import results
 from keyboard.users_kb.ikb_lks import ikb_lks, Current_lks
 from utils.db_api.quck_commands import users
 router = Router()
+
+def serialize_datetime(dt):
+    return pickle.dumps(dt).hex()
 
 @router.message(
     Command("start"),
@@ -98,9 +101,7 @@ async def take_quest(query: CallbackQuery, callback_data: Current_lks):
 
 #result""", parse_mode=ParseMode.HTML)
 
-    await query.message.answer("🔓Введите код доступа к мероприятию, чтобы получить доступ к тестам")
-
-
+    await query.message.answer("🔓Введите код доступа к мероприятию, чтобы получить доступ к тестам", reply_markup=ikb_lks(query.message.from_user.id))
 
 
 @router.message(User.test_code, Old_user())
@@ -110,38 +111,46 @@ async def start_test(message: Message, state: FSMContext):
     all_events = await event.get_all_events()
     flag = False
     for ev in all_events:
-        if str(ev.password) == str(code):
+        print("code - ", code, "event pass - ", ev.password, code == ev.password, type(code), type(ev.password))
+        if ev.password == int(code):
+            current_ev = ev
             await state.update_data(current_event=ev.id_event)
             flag = True
             break
-    if flag: #todo Вывесить список вопросов
-        data = await state.get_data()
-        id_test = data.get("current_test")
-        current_test = await tests.get_current(1, id_test=id_test)
-        count_quests = await questions.get_questions(id_test)
-        current_time = datetime.datetime.utcnow()
-        current_time = current_time.replace(tzinfo=datetime.timezone.utc, microsecond=0)
-        end_time = current_test.end_time.replace(microsecond=0)
-        differ = end_time - current_time
-        if current_time < end_time:
-            await message.answer(f"""🎬Готовы ли вы приступить к началу тестирования?
-📝Название теста - {current_test.name}
-🕘Время на прохождение теста ограниченно - {current_test.lifetime}
-🕘Время до конца существования теста - {differ}
-🔢Количество вопросов - {len(count_quests)}""", reply_markup=ikb_start_test(), parse_mode=ParseMode.HTML)
-        else:
-            await message.answer(f"⛔Тест больше не доступен. Время существования теста истекло")
+    if flag:
+        kb = await ikb_all_tests_event_user(current_ev.id_event)
+        await message.answer(f"""Список всех тестов мероприятия <b>{current_ev.event_name}</b>""", parse_mode=ParseMode.HTML, reply_markup=kb)
+        await state.set_state(User.current_test)
+
     else:
         await message.answer("❌По данному коду не было найденно тестов", reply_markup=ikb_back_code())
-        name = data.get("name")
+        name = data.get("first_name")
         await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
 
 
-def serialize_datetime(dt):
-    return pickle.dumps(dt).hex()
+
+@router.callback_query(pick_a_test_user.filter(F.cb=="ikb_current_test"))
+async def start_test(query: CallbackQuery, callback_data: pick_a_test_user, state: FSMContext):
+    print("ЗАШЛО")
+    await state.update_data(current_test=callback_data.id)
+    id_test = callback_data.id
+    current_test = await tests.get_current(1, id_test=id_test)
+    count_quests = await questions.get_questions(id_test)
+    current_time = datetime.datetime.utcnow()
+    current_time = current_time.replace(tzinfo=datetime.timezone.utc, microsecond=0)
+    end_time = current_test.end_time.replace(microsecond=0)
+    differ = end_time - current_time
+    if current_time < end_time:
+        await query.message.answer(f"""🎬Готовы ли вы приступить к началу тестирования?
+    📝Название теста - {current_test.name}
+    🕘Время на прохождение теста ограниченно - {current_test.lifetime}
+    🕘Время до конца существования теста - {differ}
+    🔢Количество вопросов - {len(count_quests)}""", reply_markup=ikb_start_test(), parse_mode=ParseMode.HTML)
+    else:
+        await query.message.answer(f"⛔Тест больше не доступен. Время существования теста истекло")
 
 
-@router.callback_query(F.data == "ikb_start_test", User.test_code, Old_user())
+@router.callback_query(F.data == "ikb_start_test", User.current_test, Old_user())
 async def second(query: CallbackQuery, state: FSMContext):
     await state.set_state(User.choose_quest)
     data = await state.get_data()

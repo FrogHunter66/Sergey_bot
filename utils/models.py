@@ -9,7 +9,6 @@ db = Gino()
 
 class BaseModel(db.Model):
     __abstract__ = True
-
     def __str__(self):
         model = self.__class__.__name__
         table: sa.Table = sa.inspect(self.__class__)
@@ -26,7 +25,7 @@ class Event(BaseModel):
 
     id_event = db.Column(db.BigInteger, primary_key=True, nullable=False)
     event_name = db.Column(db.String)
-    password = db.Column(db.String)
+    password = db.Column(db.BigInteger)
 
 
 class Test(BaseModel):

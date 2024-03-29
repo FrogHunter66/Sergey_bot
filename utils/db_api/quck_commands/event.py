@@ -25,3 +25,7 @@ async def delete_event(event_id):
     info = await Event.query.where(Event.id_event == event_id).gino.first()
     await info.delete()
 
+
+async def update_code(event_id, code):
+    ev = await Event.query.where(Event.id_event == event_id).gino.first()
+    await ev.update(password=code).apply()

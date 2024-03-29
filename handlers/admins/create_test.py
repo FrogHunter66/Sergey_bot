@@ -28,6 +28,7 @@ from keyboard.ikb_delete_event import ikb_delete_event
 from keyboard.ikb_notifications_test import ikb_notifications
 from keyboard.ikb_notifications_choose import ikb_notifications_choose
 from keyboard.ikb_notifications_test import Notifications_test
+from keyboard.ikb_back import ikb_back_actions_event
 from utils.db_api.quck_commands import tests, results, users
 router = Router()
 
@@ -38,11 +39,76 @@ router = Router()
 async def second(query: CallbackQuery, callback_data: Choose_event, state: FSMContext):
     data = await event.get_event(callback_data.id)
     name = data.event_name
-    await query.message.answer(f"⚡ Выберите действие для мероприятия <b>{name}</b>", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+    ev = await event.get_event(callback_data.id)
+    await query.message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
+
+⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.event)
     await state.update_data(event_id=callback_data.id)
     await state.update_data(event=name)
 
+#---------------------------- Access Code ------------------------------------------------------
+
+
+@router.callback_query(Current.event, F.data == "set_password")
+async def add_test2(query: CallbackQuery, state: FSMContext):
+    await state.set_state(Current.setting_code)
+    data = await state.get_data()
+    ev = await event.get_event(data.get("event_id"))
+
+    await query.message.answer(f"""🔓Напишите код по которому будет осуществлен доступ к тестам вашего мероприятия, <b>код должен быть числом</b>
+
+⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_back_actions_event(), parse_mode=ParseMode.HTML)
+
+
+@router.message(Current.setting_code, Admin())
+async def add_test3(message: Message, state: FSMContext):
+    code = message.text
+    data = await state.get_data()
+    name = data.get("event")
+    event_id = data.get("event_id")
+    ev = await event.get_event(data.get("event_id"))
+    try:
+        code = int(code)
+        print(code, type(code))
+        if code > 0:
+            is_unique = True
+            data_tests = await tests.get_all_tests()
+            for test in data_tests:
+                if test.token == code:
+                    is_unique = False
+                    break
+            if is_unique:
+                code = int(code)
+                await event.update_code(event_id=event_id, code=code)
+                await message.answer(f"""✅Код доступа к тесту *успешно* установлен {code}""", parse_mode=ParseMode.MARKDOWN_V2)
+                await message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
+
+⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+                await state.set_state(Current.event)
+            else:
+                await message.answer("❌Данный код доступа *уже используется* в другом тесте\. Придумайте другой код", parse_mode=ParseMode.MARKDOWN_V2 )
+                await message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
+                
+⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+                await state.set_state(Current.event)
+        else:
+            await message.answer("❌Код доступа должен быть *натуральным числом*", parse_mode=ParseMode.MARKDOWN_V2)
+            await message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
+            
+⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+            await state.set_state(Current.event)
+    except Exception as err:
+        await state.set_state(Current.event)
+        print(err)
+        await message.answer("❌Код может быть только *численнного формата*", parse_mode=ParseMode.MARKDOWN_V2)
+        await message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
+        
+⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+        await state.set_state(Current.event)
+
+
+#---------------------------- Notifications ---------------------------------------------------
 
 @router.callback_query(F.data == "get_stat", Current.event)
 async def second(query: CallbackQuery, state: FSMContext):
@@ -109,6 +175,7 @@ async def check_reuslts_admin(query: CallbackQuery, state: FSMContext):
         inline_message_id=query.inline_message_id
     )
 
+
 @router.callback_query(F.data == "ikb_dont_send", Current.event)
 async def check_reuslts_admin(query: CallbackQuery, state: FSMContext):
     admin_id = query.from_user.id
@@ -124,7 +191,6 @@ async def check_reuslts_admin(query: CallbackQuery, state: FSMContext):
     )
 
 #-------------------------------------- Удаляем мероприятие -------------------------------
-
 
 @router.callback_query(Current.event, F.data == "delete_event")
 async def add_test(query: CallbackQuery, state: FSMContext):
@@ -166,12 +232,6 @@ async def add_test(query: CallbackQuery, state: FSMContext):
 async def add_test2(query: CallbackQuery, state: FSMContext):
     await state.set_state(Current.setting_name)
     await query.message.answer("📝Напишите имя теста, *имя может содержать любые символы*", reply_markup=ikb_back(), parse_mode=ParseMode.MARKDOWN_V2)
-
-
-# @router.callback_query(Current.event, F.data == "access_code")
-# async def add_test2(query: CallbackQuery, state: FSMContext):
-#     await state.set_state(Current.setting_code)
-#     await query.message.answer("🔓Напишите код по которому будет осуществлен доступ к тесту, *код должен быть числом*", reply_markup=ikb_back(), parse_mode=ParseMode.MARKDOWN_V2)
 
 
 @router.callback_query(Current.event, F.data == "time_to_answer")
@@ -223,49 +283,6 @@ async def add_test3(message: Message, state: FSMContext):
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
 
-
-# @router.message(Current.setting_code, Admin())
-# async def add_test3(message: Message, state: FSMContext):
-#     code = message.text
-#     try:
-#         code = int(code)
-#         if code > 0:
-#             is_unique = True
-#             data_tests = await tests.get_all_tests()
-#             for test in data_tests:
-#                 if test.token == code:
-#                     is_unique = False
-#                     break
-#             if is_unique:
-#                 code = int(code)
-#                 await state.update_data(setting_code=code)
-#                 await message.answer(f"✅Код доступа к тесту *успешно* установлен {code}", parse_mode=ParseMode.MARKDOWN_V2)
-#                 await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
-# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
-# 🕒*Время на прохождение* теста
-# 🕒*Время существования* теста""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
-#
-#             else:
-#                 await message.answer("❌Данный код доступа *уже используется* в другом тесте\. Придумайте другой код", parse_mode=ParseMode.MARKDOWN_V2 )
-#                 await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
-# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
-# 🕒*Время на прохождение* теста
-# 🕒*Время существования* теста""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
-#         else:
-#             await message.answer("❌Код доступа должен быть *натуральным числом*", parse_mode=ParseMode.MARKDOWN_V2)
-#             await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
-# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
-# 🕒*Время на прохождение* теста
-# 🕒*Время существования* теста""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
-#         await state.set_state(Current.event)
-#     except:
-#         await state.set_state(Current.event)
-#         await message.answer("❌Код может быть только *численнного формата*", parse_mode=ParseMode.MARKDOWN_V2)
-#         await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
-# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
-# 🕒*Время на прохождение* теста
-# 🕒*Время существования* теста""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
-#
 
 @router.callback_query(Current.setting_time, Choose_timeer.filter(F.cb=="ikb_time"))
 async def add_test2(query: CallbackQuery, state: FSMContext, callback_data: Choose_timeer):

@@ -11,7 +11,7 @@ from keyboard.ikb_back import ikb_back
 from keyboard.save_event import ikb_save
 from keyboard.ikb_all_events import ikb_all_events, Choose_event
 from filters.is_admin import Admin
-from utils.db_api.quck_commands import event, users, admins
+from utils.db_api.quck_commands import event, users, admins, tests
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from states.fsm import Creation
@@ -32,9 +32,10 @@ async def second(callback: types.CallbackQuery):
     tests = admin.c_tests
     date = (admin.data_end).strftime('%Y-%m-%d')
     print(type(date))
-    await callback.message.answer(f"""Доступных мероприятий осталось - <b>{ev}</b>
-Доустпных тестов осталось - <b>{tests}</b>
-Время действия тарифа до - <b>{date}</b>
+    await callback.message.answer(f"""ℹ️Остатки по пакету - 
+🌟Мероприятий осталось - <b>{ev}</b>
+🌟Тестов осталось - <b>{tests}</b>
+⏳Время действия тарифа до - <b>{date}</b>
 
 Для продления подписки вы можете оплатить новый пакет с помощью команды /buy""", parse_mode=ParseMode.HTML, reply_markup=ikb_back())
 
