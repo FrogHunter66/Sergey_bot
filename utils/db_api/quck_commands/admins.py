@@ -1,4 +1,3 @@
-import users as users
 from aiogram.enums import ParseMode
 from aiogram.types import Message
 
@@ -23,6 +22,10 @@ async def successful_pay(message: Message, package:list):
     except Exception as err:
         await users.add_user(id=message.from_user.id, username=message.from_user.username, first_name=message.from_user.first_name, last_name=message.from_user.last_name, status="user")
         user = await users.get_current_user(message.from_user.id)
+
+
+    if user.status == "admin":
+        return True
     try:
         if user.data_end:
             end_time = (user.data_end + datetime.timedelta(days=package[3]*31)).replace(microsecond=0)
@@ -34,7 +37,6 @@ async def successful_pay(message: Message, package:list):
         else:
             current = datetime.datetime.utcnow() + datetime.timedelta(days=package[3]*31, hours=3)
             current = current.replace(tzinfo=datetime.timezone.utc, microsecond=0)
-            print("none - ", current)
             await user.update(data_end=current).apply()
             await user.update(c_events=package[0]).apply()
             await user.update(c_tests=package[1]).apply()

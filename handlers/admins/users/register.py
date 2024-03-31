@@ -83,23 +83,26 @@ async def first(message: Message, state: FSMContext):
 async def take_quest(query: CallbackQuery, callback_data: Current_lks):
     id = callback_data.id
     users_result = await results.get_all_results_id_user(id)
-    for result in users_result:
-        current_test = await tests.get_current(id_test=result.id_test, id_event=0)
-        name = current_test.name
-        ev = await event.get_event(id=current_test.id_event)
-        pluses = (result.result).count('1')
-        minuses = (result.result).count('0')
-        await query.message.answer(f"""Мероприятие: <b>{ev.name}</b>
-📋Тест: <b>{name}</b>
-        
-🎯 Процент выполнения - <b>{pluses/(pluses+minuses)//1}</b>
-
-✅ Правильных ответов - <b>{pluses}</b>
-
-❌ Неправильных овтеты - <b>{minuses}</b>
-
-
-#result""", parse_mode=ParseMode.HTML)
+    if users_result:
+        for result in users_result:
+            current_test = await tests.get_current(id_test=result.id_test, id_event=0)
+            name = current_test.name
+            ev = await event.get_event(id=current_test.id_event)
+            pluses = (result.result).count('1')
+            minuses = (result.result).count('0')
+            await query.message.answer(f"""Мероприятие: <b>{ev.name}</b>
+    📋Тест: <b>{name}</b>
+            
+    🎯 Процент выполнения - <b>{pluses/(pluses+minuses)//1}</b>
+    
+    ✅ Правильных ответов - <b>{pluses}</b>
+    
+    ❌ Неправильных овтеты - <b>{minuses}</b>
+    
+    
+    #result""", parse_mode=ParseMode.HTML)
+    else:
+        await query.message.answer("⛔Вы еще не прошли ни одного теста")
 
     await query.message.answer("🔓Введите код доступа к мероприятию, чтобы получить доступ к тестам", reply_markup=ikb_lks(query.message.from_user.id))
 
