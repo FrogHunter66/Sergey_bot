@@ -115,13 +115,13 @@ async def add_test3(message: Message, state: FSMContext):
         await tests.update_bound_time(id_event=id_ev, id_test=test_id, new_time=code)
         await state.set_state(Current.current_test)
         await message.answer(f"✅Время на прохождения теста успешно установленно *{code}*", parse_mode=ParseMode.MARKDOWN_V2)
-        await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
+        await message.answer("""📝*Название теста*  
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
     except:
         await state.set_state(Current.current_test)
         await message.answer("❌Время может быть *только численнного* формата", parse_mode=ParseMode.MARKDOWN_V2)
-        await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
+        await message.answer("""📝*Название теста* 
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
 
@@ -132,8 +132,8 @@ async def add_test3(message: Message, state: FSMContext):
     id_test = data.get("current_test")
     code = message.text
     await tests.update_name(id_test=id_test, id_event=1, new_name=code)
-    await message.answer(f"✅Имя теста успешно установлено <b>{code}</b>", parse_mode=ParseMode.HTML)
-    await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
+    await message.answer(f"✅Название теста успешно установлено <b>{code}</b>", parse_mode=ParseMode.HTML)
+    await message.answer("""📝*Название теста*
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
     await state.set_state(Current.event)
@@ -194,7 +194,7 @@ async def add_test2(query: CallbackQuery, state: FSMContext, callback_data: Choo
     test_id = data.get("current_test")
     await tests.update_lifetime(id_event=id_ev, id_test=test_id, new_time=callback_data.id)
     await query.message.answer(f"✅Время существования теста успешно установленно {callback_data.id}", parse_mode=ParseMode.MARKDOWN_V2)
-    await query.message.answer("""📝*Имя теста* в котором вы можете отразить тему теста 
+    await query.message.answer("""📝*Название теста* 
 🕒*Время на прохождение* теста
 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
     await state.set_state(Current.current_test)

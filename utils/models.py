@@ -32,7 +32,6 @@ class Test(BaseModel):
     __tablename__ = 'test'
     id_test = db.Column(db.BigInteger, primary_key=True, nullable=False)
     id_event = db.Column(db.BigInteger)
-    token = db.Column(db.BigInteger)
     lifetime = db.Column(db.String)
     end_time = db.Column(db.DateTime(timezone=True))
     bound_time = db.Column(db.BigInteger)

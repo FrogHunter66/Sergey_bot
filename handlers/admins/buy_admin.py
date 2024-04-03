@@ -12,6 +12,7 @@ from keyboard.ikb_back import ikb_back
 from keyboard.save_event import ikb_save
 from keyboard.ikb_all_events import ikb_all_events, Choose_event
 from filters.is_admin import Admin
+from logs.log_all import log_all
 from utils.db_api.quck_commands import event, admins
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -62,9 +63,9 @@ async def first(message: Message):
 @router.callback_query(Choose_price.filter(F.cb=="ikb_buy"))
 async def second(query: CallbackQuery, callback_data: Choose_price, state: FSMContext):
     if config.PAYMENTS_TOKEN.split(':')[1] == 'TEST':
-        await bot.send_message(query.message.chat.id, "Тестовый платеж!!!")
+        await bot.send_message(query.message.chat.id, "Тестовый платеж")
     await bot.send_invoice(query.message.chat.id,
-                           title="Приобрести подписку!",
+                           title=f"""{str(packages[callback_data.id-1][-1]) + " месяц" if packages[callback_data.id-1][-1] == 1 else str(packages[callback_data.id-1][-1]) + " месяцев"} подписки, {packages[callback_data.id-1][0]} мероприятий и {packages[callback_data.id-1][1]} тестов""",
                            description=f"Активация подписки на бота по {callback_data.id} - ому пакету",
                            provider_token=config.PAYMENTS_TOKEN,
                            currency="rub",
@@ -97,4 +98,5 @@ async def successful_payment(message:Message):
         await bot.send_message(message.chat.id, f"Платеж на сумму {message.successful_payment.total_amount // 100} {message.successful_payment.currency} прошел успешно")
         resp = [payment_info.invoice_payload, message.successful_payment.total_amount // 100]
         await admins.mail_to_admins(resp)
+        await log_all("sucessfull_pay", "INFO", "buy_admin.py", 100, "sucessful_pay", message.from_user.id)
 

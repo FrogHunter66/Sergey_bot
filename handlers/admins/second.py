@@ -7,6 +7,7 @@ from aiogram import types
 from aiogram.filters import Command
 from filters.is_admin import Admin
 from keyboard.list_questions import ikb_all_questions
+from logs.log_all import log_all
 from utils.db_api.quck_commands import event, tests, questions
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -28,19 +29,19 @@ router = Router()
 
 @router.callback_query(Current.event, F.data =="ikb_2nd_type")
 async def second(query: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    await state.update_data(type=2)
-    text = data.get("text")
-    variants = data.get("variants")
-    correct = data.get("correct")
-    if variants:
-        list_variants = list(map(str, variants.split(".*.")))
-        variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_variants, start=1))
-    if correct:
-        list_corrects = list(map(str, variants.split(".*.")))
-        correct = "\n".join(f"{index}) {element}" for index, element in enumerate(list_corrects, start=1))
-
-    await query.message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>множественным правильным ответом</b>
+    try:
+        data = await state.get_data()
+        await state.update_data(type=2)
+        text = data.get("text")
+        variants = data.get("variants")
+        correct = data.get("correct")
+        if variants:
+            list_variants = list(map(str, variants.split(".*.")))
+            variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_variants, start=1))
+        if correct:
+            list_corrects = list(map(str, correct.split(".*.")))
+            correct = "\n".join(f"{index}) {element}" for index, element in enumerate(list_corrects, start=1))
+        await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>множественным правильным ответом</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -51,7 +52,9 @@ async def second(query: CallbackQuery, state: FSMContext):
 ------------------------------------------------------
 <b>Правильные ответы:</b>
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(),parse_mode=ParseMode.HTML)
-    await state.set_state(Current2.event)
+        await state.set_state(Current2.event)
+    except Exception as err:
+        await log_all("create_2nd_type_quest", "ERROR", "second.py", 57, err, query.from_user.id)
 
 
 @router.callback_query(Current2.event, F.data =="ikb_text_quest")
@@ -73,7 +76,7 @@ async def second(query: CallbackQuery, state: FSMContext):
 
     if variants:
         lst_vars = list(map(str, variants.split(".*.")))
-        vars = "\n".join(f"{index}) {element}" for index, element in enumerate(lst_vars, start=1))
+        vars = "\n".join(f"{index}. {element}" for index, element in enumerate(lst_vars, start=1))
         response = f"🎯Варианты ответа: {vars}"
         await query.message.answer(response)
     else:
@@ -84,61 +87,67 @@ async def second(query: CallbackQuery, state: FSMContext):
 
 @router.message(Current2.question, Admin())
 async def question(message: Message, state:FSMContext):
-    text = message.text
-    await state.update_data(question=text)
-    data = await state.get_data()
-    text = data.get("question")
-    variants = data.get("variants")
-    correct = data.get("correct")
+    try:
+        text = message.text
+        await state.update_data(question=text)
+        data = await state.get_data()
+        text = data.get("question")
+        variants = data.get("variants")
+        correct = data.get("correct")
 
-    if variants:
-        list_vars = list(map(str, variants.split(".*.")))
-        variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_vars, start=1))
-    if correct:
-        list_corrects = list(map(str, correct.split(".*.")))
-        correct = "\n".join(f"{index}) {element}" for index, element in enumerate(list_corrects, start=1))
-    await message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>множественным выбором правильного ответа</b>
-
+        if variants:
+            list_vars = list(map(str, variants.split(".*.")))
+            variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_vars, start=1))
+        if correct:
+            list_corrects = list(map(str, correct.split(".*.")))
+            correct = "\n".join(f"{index}) {element}" for index, element in enumerate(list_corrects, start=1))
+        await message.answer(f"""🛠️Вы в конструкторе вопроса с <b>множественным выбором правильного ответа</b>
+    
 Предпросмотр вопроса - 
 <b>Текст вопроса:</b>
 {text if text else "❌Не заполненно"}
-
+    
 <b>Варианты ответа:</b>
 {variants if variants else "❌Не заполненно"}
-
+    
 <b>Правильные ответы:</b>
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
-    await state.set_state(Current2.event)
+        await state.set_state(Current2.event)
+    except Exception as err:
+        await log_all("question", "ERROR", "second.py", 117, err, message.from_user.id)
 
 
 @router.message(Current2.variants, Admin())
 async def question(message: Message, state:FSMContext):
-    data = await state.get_data()
+    try:
+        data = await state.get_data()
 
-    text = message.text
-    var_old = (data.get("variants"))
-    if var_old:
-        vars = var_old + ".*." + text
-        await state.update_data(variants=vars)
-    else:
-        await state.update_data(variants=text)
-    data_new = await state.get_data()
-    variants = data_new.get("variants")
-    list_variants = list(map(str, variants.split(".*.")))
-    text = data_new.get("question")
-    correct = data_new.get("correct")
-    await message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>множественным выбором правильного ответа</b>
-
+        text = message.text
+        var_old = (data.get("variants"))
+        if var_old:
+            vars = var_old + ".*." + text
+            await state.update_data(variants=vars)
+        else:
+            await state.update_data(variants=text)
+        data_new = await state.get_data()
+        variants = data_new.get("variants")
+        list_variants = list(map(str, variants.split(".*.")))
+        text = data_new.get("question")
+        correct = data_new.get("correct")
+        await message.answer(f"""🛠️Вы в конструкторе вопроса с <b>множественным выбором правильного ответа</b>
+    
 Предпросмотр вопроса - 
 <b>Текст вопроса:</b>
 {text if text else "❌Не заполненно"}
-
+    
 <b>Варианты ответа:</b>
 {list_variants if list_variants else "❌Не заполненно"}
-
+    
 <b>Правильные ответы:</b>
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
-    await state.set_state(Current2.event)
+        await state.set_state(Current2.event)
+    except Exception as err:
+        await log_all("question", "ERROR", "second.py", 150, err, message.from_user.id)
 
 
 @router.message(Current2.correct, Admin())
@@ -153,7 +162,6 @@ async def question(message: Message, state:FSMContext):
             vars = list(map(str, vars.split(".*.")))
             if text > 0 and text <= len(vars):
                 correct_old = (data.get("correct"))
-                print(correct_old)
                 if correct_old:
                     corrects = correct_old + ".*." + vars[text-1]
                     await state.update_data(correct=corrects)
@@ -161,19 +169,18 @@ async def question(message: Message, state:FSMContext):
                     await state.update_data(correct=vars[text-1])
                 await message.answer(f"✅Успешно установлен вариант ответа <b>{text}: {vars[text-1]}</b>", parse_mode=ParseMode.HTML)
                 data_new = await state.get_data()
-                variants = data_new.get("correct")
-                list_corrects = list(map(str, variants.split(".*.")))
+                correct = data_new.get("correct")
+                list_corrects = list(map(str, correct.split(".*.")))
                 list_corrects = "\n".join(f"{index}) {element}" for index, element in enumerate(list_corrects, start=1))
-                vars = "\n".join(f"{index}) {element}" for index, element in enumerate(vars, start=1))
-
-                await message.answer(f"""🛠️Вы в конструктуоре вопроса с <b>множественным выбором правильного ответа</b>
+                variants_str = "\n".join(f"{index}) {element}" for index, element in enumerate(vars, start=1))
+                await message.answer(f"""🛠️Вы в конструкторе вопроса с <b>множественным выбором правильного ответа</b>
 
 Предпросмотр вопроса - 
 <b>Текст вопроса:</b>
 {qest if qest else "❌Не заполненно"}
 
 <b>Варианты ответа:<b>
-{vars if vars else "❌Не заполненно"}
+{variants_str if variants_str else "❌Не заполненно"}
 
 <b>Правильный ответ:</b>
 {list_corrects if list_corrects else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
@@ -212,11 +219,14 @@ async def second(query: CallbackQuery, state: FSMContext):
             await state.update_data(type='')
             await state.set_state(Current.current_test)
         except Exception as err:
+            await log_all("add_question_to_db", "ERROR", "second.py", 222, err, query.from_user.id)
             await query.message.answer("❌Произошла ошибка")
             kb = await ikb_all_questions(test_id)
             await query.message.answer("⚡Выберите действие для вопросов⚡", reply_markup=kb)
     else:
         await query.message.answer(f"""⛔Вы не заполнили одно из полей:
 Текст вопроса - {quest if quest else "❌Не заполненно"}
+
 Варианты ответа - {vars if vars else "❌Не заполненно"}
+
 Правильный вариант ответа - {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion())

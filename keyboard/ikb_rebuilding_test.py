@@ -5,7 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardButton
 
 
 def ikb_rebuild():
-    btn6 = InlineKeyboardButton(text="📝Имя теста", callback_data="ikb_name_for_test")
+    btn6 = InlineKeyboardButton(text="📝Название теста", callback_data="ikb_name_for_test")
     btn2 = InlineKeyboardButton(text="🕒Время на выполнение", callback_data="time_to_answer")
     btn3 = InlineKeyboardButton(text="🕒Время существования", callback_data="time_of_test")
     btn4 = InlineKeyboardButton(text="🛠️Редактировать вопросы", callback_data="ikb_qustions_rebuild")

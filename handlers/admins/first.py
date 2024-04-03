@@ -36,7 +36,7 @@ async def second(query: CallbackQuery, state: FSMContext):
     if variants:
         list_vars = list(map(str, variants.split(".*.")))
         variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_vars, start=1))
-        await query.message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+        await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -48,7 +48,7 @@ async def second(query: CallbackQuery, state: FSMContext):
 <b>Правильный ответ:</b>
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)  # p
     else:
-        await query.message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+        await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
 Предпросмотр вопроса: 
     
 <b>Текст вопроса:</b>
@@ -80,7 +80,7 @@ async def second(query: CallbackQuery, state: FSMContext):
     variants = data.get("variants")
     if variants:
         lst_vars = list(map(str, variants.split(".*.")))
-        vars = "\n".join(f"{index}) {element}" for index, element in enumerate(lst_vars, start=1))
+        vars = "\n".join(f"{index}. {element}" for index, element in enumerate(lst_vars, start=1))
         response = f"🎯Варианты ответа: {vars}"
         await query.message.answer(response)
     else:
@@ -100,7 +100,7 @@ async def question(message: Message, state:FSMContext):
     if variants:
         list_vars = list(map(str, variants.split(".*.")))
         variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_vars, start=1))
-        await message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+        await message.answer(f"""🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -112,7 +112,7 @@ async def question(message: Message, state:FSMContext):
 <b>Правильный ответ:</b>
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)  # p
     else:
-        await message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+        await message.answer(f"""🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -147,7 +147,7 @@ async def question(message: Message, state:FSMContext):
         list_variants = list(map(str, variants.split(".*.")))
         variants = "\n".join(f"{index}) {element}" for index, element in enumerate(list_variants, start=1))
 
-    await message.answer(f"""🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+    await message.answer(f"""🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -176,7 +176,7 @@ async def question(message: Message, state:FSMContext):
                 variants = "\n".join(f"{index}) {element}" for index, element in enumerate(vars, start=1))
 
                 await message.answer(f"✅Успешно установлен вариант ответа <b>{text}: {vars[text-1]}</b>", parse_mode=ParseMode.HTML)
-                await message.answer(f"""️🛠️Вы в конструктуоре вопроса c <b>единственным правильным ответом</b>
+                await message.answer(f"""️🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>

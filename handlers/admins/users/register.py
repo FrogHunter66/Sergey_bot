@@ -145,10 +145,10 @@ async def start_test(query: CallbackQuery, callback_data: pick_a_test_user, stat
     differ = end_time - current_time
     if current_time < end_time:
         await query.message.answer(f"""🎬Готовы ли вы приступить к началу тестирования?
-    📝Название теста - {current_test.name}
-    🕘Время на прохождение теста ограниченно - {current_test.lifetime}
-    🕘Время до конца существования теста - {differ}
-    🔢Количество вопросов - {len(count_quests)}""", reply_markup=ikb_start_test(), parse_mode=ParseMode.HTML)
+📝Название теста - {current_test.name}
+🕘Время на прохождение теста ограниченно - {current_test.lifetime}
+🕘Время до конца существования теста - {differ}
+🔢Количество вопросов - {len(count_quests)}""", reply_markup=ikb_start_test(), parse_mode=ParseMode.HTML)
     else:
         await query.message.answer(f"⛔Тест больше не доступен. Время существования теста истекло")
 
