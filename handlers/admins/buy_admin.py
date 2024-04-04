@@ -12,7 +12,7 @@ from keyboard.ikb_back import ikb_back
 from keyboard.save_event import ikb_save
 from keyboard.ikb_all_events import ikb_all_events, Choose_event
 from filters.is_admin import Admin
-from logs.log_all import log_all
+from set_logs1.logger_all1 import log_exceptions1
 from utils.db_api.quck_commands import event, admins
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -98,5 +98,5 @@ async def successful_payment(message:Message):
         await bot.send_message(message.chat.id, f"Платеж на сумму {message.successful_payment.total_amount // 100} {message.successful_payment.currency} прошел успешно")
         resp = [payment_info.invoice_payload, message.successful_payment.total_amount // 100]
         await admins.mail_to_admins(resp)
-        await log_all("sucessfull_pay", "INFO", "buy_admin.py", 100, "sucessful_pay", message.from_user.id)
+        await log_exceptions1("sucessfull_pay", "INFO", "buy_admin.py", 100, "sucessful_pay", message.from_user.id)
 

@@ -11,6 +11,7 @@ from keyboard.ikb_back import ikb_back
 from keyboard.save_event import ikb_save
 from keyboard.ikb_all_events import ikb_all_events
 from filters.is_admin import Admin
+from set_logs1.logger_all1 import log_exceptions1
 from utils.db_api.quck_commands import event
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -281,7 +282,7 @@ async def second(query: CallbackQuery, state: FSMContext):
         await state.update_data(type=None)
     except Exception as err:
         await state.set_state(Current.current_test)
-        print("err in 251 line commands for test", err)
+        await log_exceptions1("change_quest", "ERROR", "commands_for_tests.py", 285, err, query.from_user.id)
         await query.message.answer("Произошла ошибка")
         await query.message.answer(
 f"""🛠️Вы в редакторе вопроса {id_quest} с выбором <b>{" единственного правильно ответа" if typee == 1 else " множественного правильного ответа "}</b>

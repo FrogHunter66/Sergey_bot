@@ -7,7 +7,7 @@ from aiogram import types
 from aiogram.filters import Command
 from filters.is_admin import Admin
 from keyboard.list_questions import ikb_all_questions
-from logs.log_all import log_all
+from set_logs1.logger_all1 import log_exceptions1
 from utils.db_api.quck_commands import event, tests, questions
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -131,7 +131,7 @@ async def question(message: Message, state:FSMContext):
     {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
         await state.set_state(Current.rebuild_quest)
     except Exception as err:
-        await log_all("question", "ERROR", "reuild_question.py", 134, err, message.from_user.id)
+        await log_exceptions1("question", "ERROR", "reuild_question.py", 134, err, message.from_user.id)
 
 
 @router.message(Current.rebuild_correct, Admin())

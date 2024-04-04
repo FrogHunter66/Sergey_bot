@@ -7,7 +7,7 @@ from aiogram import types
 from aiogram.filters import Command
 from filters.is_admin import Admin
 from keyboard.list_questions import ikb_all_questions
-from logs.log_all import log_all
+from set_logs1.logger_all1 import log_exceptions1
 from utils.db_api.quck_commands import event, tests, questions
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -54,7 +54,7 @@ async def second(query: CallbackQuery, state: FSMContext):
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(),parse_mode=ParseMode.HTML)
         await state.set_state(Current2.event)
     except Exception as err:
-        await log_all("create_2nd_type_quest", "ERROR", "second.py", 57, err, query.from_user.id)
+        await log_exceptions1("create_2nd_type_quest", "ERROR", "second.py", 57, err, query.from_user.id)
 
 
 @router.callback_query(Current2.event, F.data =="ikb_text_quest")
@@ -114,7 +114,7 @@ async def question(message: Message, state:FSMContext):
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
         await state.set_state(Current2.event)
     except Exception as err:
-        await log_all("question", "ERROR", "second.py", 117, err, message.from_user.id)
+        await log_exceptions1("question", "ERROR", "second.py", 117, err, message.from_user.id)
 
 
 @router.message(Current2.variants, Admin())
@@ -147,7 +147,7 @@ async def question(message: Message, state:FSMContext):
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
         await state.set_state(Current2.event)
     except Exception as err:
-        await log_all("question", "ERROR", "second.py", 150, err, message.from_user.id)
+        await log_exceptions1("question", "ERROR", "second.py", 150, err, message.from_user.id)
 
 
 @router.message(Current2.correct, Admin())
@@ -219,7 +219,7 @@ async def second(query: CallbackQuery, state: FSMContext):
             await state.update_data(type='')
             await state.set_state(Current.current_test)
         except Exception as err:
-            await log_all("add_question_to_db", "ERROR", "second.py", 222, err, query.from_user.id)
+            await log_exceptions1("add_question_to_db", "ERROR", "second.py", 222, err, query.from_user.id)
             await query.message.answer("❌Произошла ошибка")
             kb = await ikb_all_questions(test_id)
             await query.message.answer("⚡Выберите действие для вопросов⚡", reply_markup=kb)

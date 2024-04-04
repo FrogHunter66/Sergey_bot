@@ -11,6 +11,7 @@ from keyboard.ikb_back import ikb_back
 from keyboard.save_event import ikb_save
 from keyboard.ikb_all_events import ikb_all_events, Choose_event
 from filters.is_admin import Admin
+from set_logs1.logger_all1 import log_exceptions1
 from utils.db_api.quck_commands import event, users, admins, tests
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -83,11 +84,10 @@ async def second(callback: types.CallbackQuery, state:FSMContext):
     try:
         await event.add_event(id_event=key, name=str(data.get('name_event')))
         await admins.add_event(callback.from_user.id, key)
-
         await state.clear()
         await admins.decrement_events(callback.from_user.id)
         await callback.message.answer(f"✅Успешно добавлено мероприятие. Осталось досутпных мероприятий <b>{admin.c_events - 1}</b>", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
     except Exception as err:
         await callback.message.answer("❌Ошибка сохранения", reply_markup=ikb_back())
         await state.clear()
-        print(err)
+        await log_exceptions1("create_event_final", "ERROR", "create_event.py", 94, err, callback.from_user.id)

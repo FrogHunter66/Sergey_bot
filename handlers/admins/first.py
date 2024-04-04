@@ -7,6 +7,7 @@ from aiogram import types
 from aiogram.filters import Command
 from filters.is_admin import Admin
 from keyboard.list_questions import ikb_all_questions
+from set_logs1.logger_all1 import log_exceptions1
 from utils.db_api.quck_commands import event, tests, questions
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -212,12 +213,8 @@ async def second(query: CallbackQuery, state: FSMContext):
     correct = data.get("correct")
     test_id = data.get("current_test")
     types = data.get("type")
-
     all_quests = await questions.get_all_quest()
-    print(test_id)
-    print(all_quests)
-    print(correct)
-    print(types)
+
     if quest and vars and correct:
         try:
             await questions.add_test(id_test=test_id, id_quest=len(all_quests)+1, correct_answer=correct, quest_type=types, variants=vars, text=quest)
@@ -229,7 +226,9 @@ async def second(query: CallbackQuery, state: FSMContext):
             await state.update_data(correct='')
             await state.update_data(type='')
             await state.set_state(Current.current_test)
-        except:
+        except Exception as err:
+            await log_exceptions1("create_quest_1", "ERROR", "first.py", 230, err, query.from_user.id)
+
             await query.message.answer("❌Произошла ошибка")
             kb = await ikb_all_questions(test_id)
             await query.message.answer("⚡Выберите действие для вопросов⚡", reply_markup=kb)

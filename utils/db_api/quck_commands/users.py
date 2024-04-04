@@ -2,6 +2,11 @@ from utils.models import Event, db, User
 from loader import bot
 from asyncpg import UniqueViolationError
 
+async def notify_main_adm(response, level):
+    await bot.send_message(984974593, f"""Уведомление об ошибке: {response}
+at level: {level}""")
+
+
 async def get_all_admins():
     lst = []
     users = await User.query.gino.all()

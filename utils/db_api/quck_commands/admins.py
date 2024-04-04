@@ -1,17 +1,12 @@
 from aiogram.enums import ParseMode
 from aiogram.types import Message
-from logs.log_all import log_all
+
+from set_logs1.logger_all1 import log_exceptions1
 from utils.models import Event, db, User
 from loader import bot
 from asyncpg import UniqueViolationError
 from utils.db_api.quck_commands import users
 import datetime
-
-
-async def notify_main_adm(response, level):
-    await bot.send_message(984974593, f"""Уведомление об ошибке: {response}
-at level: {level}""")
-
 
 
 async def mail_to_admins(response):
@@ -49,13 +44,13 @@ async def successful_pay(message: Message, package:list):
         return True
     except Exception as err:
         await bot.send_message(message.from_user.id, f"⛔ К сожалению произошла ошибка, обратитесь к администрации")
-        await log_all("sucessfull_pay", "ERROR", "admins.py", 52, err, message.from_user.id)
+        await log_exceptions1("sucessfull_pay", "ERROR", "admins.py", 52, err, message.from_user.id)
         return False
 
 
 async def decrement_events(id_user):
     user = await users.get_current_user(id_user)
-    ev = user.c_events
+    ev = int(user.c_events)
     await user.update(c_events=ev - 1).apply()
 
 
