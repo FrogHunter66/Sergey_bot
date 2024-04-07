@@ -72,7 +72,7 @@ async def second(query: CallbackQuery, state: FSMContext):
 #------------------------------ Изменение вариантов ответа -----------------------------------
 @router.callback_query(Current.event, F.data =="ikb_change_quest_variant")
 async def second(query: CallbackQuery, state: FSMContext):
-    await query.message.answer("🔠Выберите действие для вариантов ответа", reply_markup=ikb_change_variants_question()) #todo Чекнуть бэк
+    await query.message.answer("🔠Выберите действие для вариантов ответа", reply_markup=ikb_change_variants_question())
 
 
 @router.callback_query(Current.event, F.data == "ikb_add_new_variant")
@@ -110,7 +110,7 @@ async def question(query: CallbackQuery, state:FSMContext):
         variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
         await query.message.answer(f"""🔠Текущие установленные варианты:
 {variants}
-🎯Введите вариант ответа, который хотите удалить от 1 до {len(list_variants) + 1}""") # todo можно бэк
+🎯Введите вариант ответа, который хотите удалить от 1 до {len(list_variants)}""") # todo можно бэк
         await state.set_state(Current.variants_del)
     else:
         text = data.get("question")
@@ -138,13 +138,14 @@ async def question(message: Message, state:FSMContext):
         num = int(num)
         variants = data.get("variants")
         list_vars = list(map(str, variants.split(".*.")))
-        deleted_var = list_vars.pop(num)
+        deleted_var = list_vars.pop(num-1)
         new_vars = ".*.".join(list_vars)
         text = data.get('question')
         correct = data.get("correct")
 
         variants_str = "\n".join(f"{index}. {element}" for index, element in enumerate(list_vars, start=1))
         await state.update_data(variants=new_vars)
+        print(variants_str)
         await message.answer(f"""✅Варианты ответов были успешно обновлены. {deleted_var} Был успешно удален
 Текущий список ответов:
 {variants_str if len(list_vars) > 0 else "❌Не заполненно"}""")
@@ -155,7 +156,7 @@ async def question(message: Message, state:FSMContext):
 {text if text else "❌Не заполненно"}
 
 <b>Варианты ответа:</b>
-{variants if variants else "❌Не заполненно"}
+{variants_str if variants else "❌Не заполненно"}
 
 <b>Правильный ответ:</b>
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(),

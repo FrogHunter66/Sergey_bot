@@ -28,16 +28,20 @@ class Current(StatesGroup):
     setting_name2 = State()
     setting_time2 = State()
 
-    rebuild_quest = State()
     type = State()
     question = State()
     variants_new = State()
     variants_del = State()
     correct = State()
 
+
+
+    rebuild_quest = State()
     rebuild_type = State()
     rebuild_question = State()
     rebuild_variants = State()
+    rebuild_variants_new = State()
+    rebuild_variants_del = State()
     rebuild_correct = State()
 
     volume_vars = State()

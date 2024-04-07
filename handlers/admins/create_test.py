@@ -280,19 +280,19 @@ async def add_test3(message: Message, state: FSMContext):
             await message.answer(f"✅Время на прохождение теста *успешно* установлено *{code}*", parse_mode=ParseMode.MARKDOWN_V2)
             await message.answer(f"""📝Название теста <b>{setting_name if setting_name else "❌Пока не указано"}</b>
 🕒Время на прохождение теста <b>{code} минут</b>
-🕒Время существования теста <b>{setting_time if setting_time else "❌Пока не указано"}</b>""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
+🕒Время существования теста <b>{setting_time if setting_time else "❌Пока не указано"}</b>""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.HTML)
         else:
             await message.answer("❌Время должно быть *натуральным числом*", parse_mode=ParseMode.MARKDOWN_V2)
             await message.answer(f"""📝Название теста <b>{setting_name if setting_name else "❌Пока не указано"}</b>
 🕒Время на прохождение теста <b>{setting_passing if setting_passing else "❌Пока не указано"}</b>
-🕒Время существования теста <b>{setting_time if setting_time else "❌Пока не указано"}</b>""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
+🕒Время существования теста <b>{setting_time if setting_time else "❌Пока не указано"}</b>""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.HTML)
         await state.set_state(Current.event)
     except:
         await state.set_state(Current.event)
-        await message.answer("❌Время может быть только *численнного формата*")
+        await message.answer("❌Время может быть только *численнного формата*", parse_mode=ParseMode.MARKDOWN_V2)
         await message.answer(f"""📝Название теста <b>{setting_name if setting_name else "❌Пока не указано"}</b>
 🕒Время на прохождение теста <b>{setting_passing if setting_passing else "❌Пока не указано"}</b>
-🕒Время существования теста <b>{setting_time if setting_time else "❌Пока не указано"}</b>""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
+🕒Время существования теста <b>{setting_time if setting_time else "❌Пока не указано"}</b>""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(Current.setting_time, Choose_timeer.filter(F.cb=="ikb_time"))

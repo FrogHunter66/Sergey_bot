@@ -43,6 +43,10 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer("""✏️Выберите тип вопроса:
 1️⃣1 тип \- вопрос с единственным правильным ответом
 🔢2 тип \- вопрос с множественным выбором""", reply_markup=ikb_types_of_questions(),parse_mode=ParseMode.MARKDOWN_V2)
+    await state.update_data(text=None)
+    await state.update_data(variants=None)
+    await state.update_data(correct=None)
+    await state.update_data(type=None)
 
 
 @router.callback_query(F.data == "ikb_back_choose_type", Current2.event)
@@ -130,6 +134,12 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
+    if correct:
+        list_corrects = list(map(str, correct.split(".*.")))
+        correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
     await callback.message.answer(f"""🛠️Вы в конструкторе вопроса с <b>множественным выбором правильного ответа</b>
 
 Предпросмотр вопроса - 
@@ -150,6 +160,12 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
+    if correct:
+        list_corrects = list(map(str, correct.split(".*.")))
+        correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
     await callback.message.answer(f"""🛠️Вы в конструкторе вопроса с <b>множественным выбором правильного ответа</b>
 
 Предпросмотр вопроса - 
@@ -170,6 +186,12 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
+    if correct:
+        list_corrects = list(map(str, correct.split(".*.")))
+        correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
     await callback.message.answer(f"""🛠️Вы в конструкторе вопроса с <b>множественным выбором правильного ответа</b>
 
 Предпросмотр вопроса - 
@@ -190,6 +212,10 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
+
     await callback.message.answer(f"""🛠️Вы в конструкторе вопроса с <b>выбором единственного правильного ответа</b>
 
 Предпросмотр вопроса - 
@@ -210,6 +236,10 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
+
     await callback.message.answer(f"""🛠️Вы в конструкторе вопроса с <b>выбором единственного правильного ответа</b>
 
 Предпросмотр вопроса - 
@@ -224,12 +254,70 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Current.event)
 
 
-@router.callback_query(F.data == "ikb_back", Current.variants)
+@router.callback_query(Current2.event, F.data == "ikb_back_settings_quest")
+async def second(query: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    text = data.get("question")
+    variants = data.get("variants")
+    correct = data.get("correct")
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
+    if correct:
+        list_corrects = list(map(str, correct.split(".*.")))
+        correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
+
+    await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>множественного правильным ответом</b>
+Предпросмотр вопроса: 
+
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильный ответ:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
+
+
+
+@router.callback_query(Current.event, F.data == "ikb_back_settings_quest")
+async def second(query: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    text = data.get("question")
+    variants = data.get("variants")
+    correct = data.get("correct")
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
+    if correct:
+        list_corrects = list(map(str, correct.split(".*.")))
+        correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
+    await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
+Предпросмотр вопроса: 
+
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильный ответ:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
+
+
+@router.callback_query(F.data == "ikb_back", Current.variants_new)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
+    if correct:
+        list_corrects = list(map(str, correct.split(".*.")))
+        correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
     await callback.message.answer(f"""🛠️Вы в конструкторе вопроса с <b>выбором единственного правильного ответа</b>
 
 Предпросмотр вопроса - 
