@@ -280,6 +280,27 @@ async def second(query: types.CallbackQuery, state: FSMContext):
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
 
 
+@router.callback_query(Current.rebuild_quest, F.data == "ikb_back_settings_quest")
+async def second(query: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    text = data.get("question")
+    variants = data.get("variants")
+    correct = data.get("correct")
+    if variants:
+        list_variants = list(map(str, variants.split(".*.")))
+        variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
+    await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
+Предпросмотр вопроса: 
+
+<b>Текст вопроса:</b>
+{text if text else "❌Не заполненно"}
+
+<b>Варианты ответа:</b>
+{variants if variants else "❌Не заполненно"}
+
+<b>Правильный ответ:</b>
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
+
 
 @router.callback_query(Current.event, F.data == "ikb_back_settings_quest")
 async def second(query: types.CallbackQuery, state: FSMContext):
@@ -290,9 +311,6 @@ async def second(query: types.CallbackQuery, state: FSMContext):
     if variants:
         list_variants = list(map(str, variants.split(".*.")))
         variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
-    if correct:
-        list_corrects = list(map(str, correct.split(".*.")))
-        correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
     await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
 Предпросмотр вопроса: 
 
@@ -315,9 +333,6 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     if variants:
         list_variants = list(map(str, variants.split(".*.")))
         variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
-    if correct:
-        list_corrects = list(map(str, correct.split(".*.")))
-        correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
     await callback.message.answer(f"""🛠️Вы в конструкторе вопроса с <b>выбором единственного правильного ответа</b>
 
 Предпросмотр вопроса - 
