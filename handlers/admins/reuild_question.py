@@ -33,7 +33,7 @@ async def second(query: CallbackQuery, state: FSMContext):
     await state.set_state(Current.rebuild_question)
 
 
-@router.callback_query(Current.rebuild_quest, F.data =="ikb_add_variant")
+@router.callback_query(Current.rebuild_quest, F.data =="ikb_change_quest_variant")
 async def second(query: CallbackQuery, state: FSMContext):
     await query.message.answer("🔢Введите вариант ответа", reply_markup=ikb_back())
     await state.set_state(Current.rebuild_variants)

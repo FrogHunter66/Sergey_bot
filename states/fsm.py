@@ -31,7 +31,8 @@ class Current(StatesGroup):
     rebuild_quest = State()
     type = State()
     question = State()
-    variants = State()
+    variants_new = State()
+    variants_del = State()
     correct = State()
 
     rebuild_type = State()
@@ -55,6 +56,8 @@ class Current2(StatesGroup):
     type = State()
     question = State()
     variants = State()
+    variants_new = State()
+    variants_del = State()
     correct = State()
     volume_vars = State()
     num_of_correct = State()
