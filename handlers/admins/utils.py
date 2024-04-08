@@ -379,11 +379,12 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "back_to_rebuild_test", Current.event)
 async def second(callback: types.CallbackQuery, state: FSMContext):
-    data_state = await state.get_data()
-    num = data_state.get("setting_name")
-    name = data_state.get("event")
-    await callback.message.answer(f"⚡Выберите действие для теста <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
-    await state.set_state(Current.current_test)
+    data = await state.get_data()
+    id_ev = data.get("event_id")
+    ev = await event.get_event(id_ev)
+    await callback.message.answer(f"""⚡ Выберите действие для мероприятия <b>{ev.event_name}</b>
+
+⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
 
 #-----------------------------------------------------------------
 

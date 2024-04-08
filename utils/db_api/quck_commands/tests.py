@@ -1,3 +1,4 @@
+from utils.db_api.quck_commands import users
 from utils.models import Test, db
 import datetime
 from loader import bot
@@ -80,4 +81,9 @@ async def delete_notifications(id_test, id_admin):
         await test.update(notifications=notifications).apply()
     except:
         pass
+
+async def decrement_tests(id_user):
+    user = await users.get_current_user(id_user)
+    ev = int(user.c_tests)
+    await user.update(c_tests=ev - 1).apply()
 

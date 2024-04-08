@@ -226,10 +226,13 @@ async def add_test(query: CallbackQuery, state: FSMContext):
 
 @router.callback_query(Current.event, F.data == "create_test")
 async def add_test(query: CallbackQuery, state: FSMContext):
-    await query.message.answer("""🛠️Выберите настройки опроса:
+    user = await users.get_current_user(query.from_user.id)
+    await query.message.answer(f"""🛠️Выберите настройки опроса:
 📝*Название теста* 
 🕒*Время на прохождение* теста
-🕒*Время существования* теста""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
+🕒*Время существования* теста
+
+Количество оставшихся тестов: *{user.c_tests}*""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
 
 @router.callback_query(Current.event, F.data == "ikb_name_for_test")
 async def add_test2(query: CallbackQuery, state: FSMContext):
@@ -284,25 +287,27 @@ async def add_test3(message: Message, state: FSMContext):
         else:
             await message.answer("❌Время должно быть *натуральным числом*", parse_mode=ParseMode.MARKDOWN_V2)
             await message.answer(f"""📝Название теста <b>{setting_name if setting_name else "❌Пока не указано"}</b>
-🕒Время на прохождение теста <b>{setting_passing if setting_passing else "❌Пока не указано"}</b>
+🕒Время на прохождение теста <b>{str(setting_passing) + "минут" if setting_passing else "❌Пока не указано"}</b>
 🕒Время существования теста <b>{setting_time if setting_time else "❌Пока не указано"}</b>""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.HTML)
         await state.set_state(Current.event)
     except:
         await state.set_state(Current.event)
         await message.answer("❌Время может быть только *численнного формата*", parse_mode=ParseMode.MARKDOWN_V2)
         await message.answer(f"""📝Название теста <b>{setting_name if setting_name else "❌Пока не указано"}</b>
-🕒Время на прохождение теста <b>{setting_passing if setting_passing else "❌Пока не указано"}</b>
+🕒Время на прохождение теста <b>{str(setting_passing) + "минут" if setting_passing else "❌Пока не указано"}</b>
 🕒Время существования теста <b>{setting_time if setting_time else "❌Пока не указано"}</b>""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(Current.setting_time, Choose_timeer.filter(F.cb=="ikb_time"))
 async def add_test2(query: CallbackQuery, state: FSMContext, callback_data: Choose_timeer):
     await state.update_data(setting_time=callback_data.id)
-
+    data = await state.get_data()
+    setting_name = data.get('setting_name')
+    setting_passing = data.get("setting_passing")
     await query.message.answer(f"✅Время существования теста успешно установленно *{callback_data.id}*", parse_mode=ParseMode.MARKDOWN_V2)
-    await query.message.answer("""📝*Название теста* 
-🕒*Время на прохождение* теста
-🕒*Время существования* теста""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
+    await query.message.answer(f"""📝Название теста <b>{setting_name if setting_name else "❌Пока не указано"}</b>
+🕒Время на прохождение теста <b>{str(setting_passing) + "минут" if setting_passing else "❌Пока не указано"}</b>
+🕒Время существования теста <b>{callback_data.id if callback_data.id else "❌Пока не указано"}</b>""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.event)
 
 #---------------------------------- Создание теста и добавление в бд --------------------------------------
@@ -330,6 +335,11 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
             id_test = await get_unique_key(values)
             await state.update_data(current_test=id_test)
             await tests.add_test(id_event=id, setting_time=time, setting_passing=passing, id_test=id_test, name=test_name)
+
+            await tests.decrement_tests(query.from_user.id)
+            print(query.from_user.id)
+            user = await users.get_current_user(query.from_user.id)
+            await query.message.answer(f"✔️Тест успешно создан. Количество оставшихся тестов: <b>{user.c_tests}</b>", parse_mode=ParseMode.HTML)
             await query.message.answer("❔Можете приступить к заполнению вопросами", reply_markup=ikb_adding_questions())
             await state.update_data(setting_passing="")
             await state.update_data(setting_time="")

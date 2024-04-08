@@ -84,6 +84,7 @@ async def second(query: CallbackQuery, state: FSMContext):
 @router.callback_query(Current.event, F.data == "ikb_clear_all_vars")
 async def second(query: CallbackQuery, state: FSMContext):
     await state.update_data(variants=None)
+    await state.update_data(correct=None)
     data = await state.get_data()
     text = data.get("question")
     correct = data.get("correct")
