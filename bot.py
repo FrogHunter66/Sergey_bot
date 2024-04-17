@@ -27,7 +27,7 @@ async def main():
     await set_commands(bot)
     try:
 
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.ERROR, filename="set_logs1/logfile.log", filemode='w')
         storage = MemoryStorage()
 
         dp = Dispatcher(storage=storage)

@@ -4,7 +4,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from utils.models import db
 import config
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR, filename="set_logs1/logfile.log", filemode='w')
 bot = Bot(token=config.TELEGRAM_TOKEN)
 storage = MemoryStorage()
 

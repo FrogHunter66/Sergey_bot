@@ -90,4 +90,5 @@ async def second(callback: types.CallbackQuery, state:FSMContext):
     except Exception as err:
         await callback.message.answer("❌Ошибка сохранения", reply_markup=ikb_back())
         await state.clear()
+        print(err)
         await log_exceptions1("create_event_final", "ERROR", "create_event.py", 94, err, callback.from_user.id)

@@ -65,14 +65,14 @@ async def first(message: Message, state: FSMContext):
     name = message.text
     await state.update_data(first_name=name)
     await state.update_data(username="@" + message.from_user.username)
-    await message.answer(f"👋Привет, {name}, напишите код доступа к мероприятию, чтобы получить доступ к тестам", reply_markup=ikb_lks(message.from_user.id))
+    await message.answer(f"👋Привет, {name}, напишите код доступа к мероприятию, чтобы получить доступ к тестам.", reply_markup=ikb_lks(message.from_user.id))
     await state.set_state(User.test_code)
 
 @router.message(Command("start"), Old_user())
 async def first(message: Message, state: FSMContext):
     user = await users.get_current_user(message.from_user.id)
     name = user.first_name
-    await message.answer(f"""👋Привет, {name}, напишите код доступа к мероприятию, чтобы получить доступ к тестам""", parse_mode=ParseMode.HTML, reply_markup=ikb_lks(message.from_user.id))
+    await message.answer(f"""👋Привет, {name}, напишите код доступа к мероприятию, чтобы получить доступ к тестам.""", parse_mode=ParseMode.HTML, reply_markup=ikb_lks(message.from_user.id))
     await state.set_state(User.test_code)
     await state.update_data(first_name=name)
     await state.update_data(username="@" + message.from_user.username)
@@ -128,7 +128,7 @@ async def start_test(message: Message, state: FSMContext):
     else:
         await message.answer("❌По данному коду не было найденно тестов", reply_markup=ikb_back_code())
         name = data.get("first_name")
-        await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
+        await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти.")
 
 
 
@@ -172,6 +172,6 @@ async def second(query: CallbackQuery, state: FSMContext):
 async def second(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     name = data.get("first_name")
-    await query.message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти")
+    await query.message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти.")
 
 

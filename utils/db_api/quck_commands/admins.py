@@ -51,13 +51,13 @@ async def successful_pay(message: Message, package:list):
 async def decrement_events(id_user):
     user = await users.get_current_user(id_user)
     ev = int(user.c_events)
-    await user.update(c_events=ev - 1).apply()
+    await user.update(c_events=ev-1).apply()
 
 
 async def add_event(id_user, id_event):
     admin = await users.get_current_user(id_user)
     if admin.events:
-        lst = list(map(int, admin.events.split()))
+        lst = admin.events
         lst.append(id_event)
         await admin.update(events=lst).apply()
     else:

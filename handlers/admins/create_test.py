@@ -57,9 +57,9 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     ev = await event.get_event(data.get("event_id"))
 
-    await query.message.answer(f"""🔓Напишите код по которому будет осуществлен доступ к тестам вашего мероприятия, <b>код должен быть пятизначным числом</b>
+    await query.message.answer(f"""🔓Напишите код, по которому будет осуществлен доступ к тестам вашего мероприятия, <b>код должен быть пятизначным числом</b>.
 
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_back_actions_event(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_back_actions_event(), parse_mode=ParseMode.HTML)
 
 
 @router.message(Current.setting_code, Admin())
