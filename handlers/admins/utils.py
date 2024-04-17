@@ -72,7 +72,7 @@ async def add_test2(query: types.CallbackQuery, state: FSMContext):
 
     await query.message.answer(f"""⚡Выберите действие для мероприятия {name}
     
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "ikb_back_actions", Current.event)
@@ -83,7 +83,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
 
     await callback.message.answer(f"""⚡Выберите действие для мероприятия {name}
     
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "ikb_back_to_notifications", Current.event)
@@ -92,7 +92,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     name = data.get("event_name")
     ev = await event.get_event(data.get("event_id"))
     await callback.message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "ikb_back_tochoose_opros", Current.event)
@@ -102,7 +102,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     ev = await event.get_event(data.get("event_id"))
     await callback.message.answer(f"""⚡Выберите действие для мероприятия <b>{name}</b>
     
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
 
 
 #-------------------------------------------------------------------------------
@@ -384,7 +384,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     ev = await event.get_event(id_ev)
     await callback.message.answer(f"""⚡ Выберите действие для мероприятия <b>{ev.event_name}</b>
 
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
 
 #-----------------------------------------------------------------
 

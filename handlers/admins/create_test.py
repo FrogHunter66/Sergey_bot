@@ -43,7 +43,7 @@ async def second(query: CallbackQuery, callback_data: Choose_event, state: FSMCo
     ev = await event.get_event(callback_data.id)
     await query.message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
 
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.event)
     await state.update_data(event_id=callback_data.id)
     await state.update_data(event=name)
@@ -85,19 +85,19 @@ async def add_test3(message: Message, state: FSMContext):
                 ev = await event.get_event(event_id)
                 await message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
 
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
                 await state.set_state(Current.event)
             else:
                 await message.answer("❌Данный код доступа *уже используется* в другом мероприятии\. Придумайте другой код", parse_mode=ParseMode.MARKDOWN_V2 )
                 await message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
                 
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
                 await state.set_state(Current.event)
         else:
             await message.answer("❌Код доступа должен быть *пятизначным числом*", parse_mode=ParseMode.MARKDOWN_V2)
             await message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
             
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
             await state.set_state(Current.event)
     except Exception as err:
         await state.set_state(Current.event)
@@ -105,7 +105,7 @@ async def add_test3(message: Message, state: FSMContext):
         await message.answer("❌Код может быть только *численнного формата*", parse_mode=ParseMode.MARKDOWN_V2)
         await message.answer(f"""⚡ Выберите действие для мероприятия <b>{name}</b>
         
-⚡Текущий код доуступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
+⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_current_test(), parse_mode=ParseMode.HTML)
         await state.set_state(Current.event)
 
 
