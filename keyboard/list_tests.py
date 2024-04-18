@@ -16,8 +16,11 @@ async def ikb_all_tests(id):
     lst = list()
     for i, event in enumerate(events):
         cb = Choose_test(cb="ikb_tests", id=event.id_test).pack()
-        btn1 = InlineKeyboardButton(text=f"{i+1} - й тест", callback_data=cb)
+        current = await tests.get_current(1, id_test=event.id_test)
+
+        btn1 = InlineKeyboardButton(text=f"{current.name}", callback_data=cb)
         lst.append(btn1)
     btn3 = (InlineKeyboardButton(text="↩️Назад", callback_data=f"ikb_back_tochoose_opros"))
-    builder = InlineKeyboardMarkup(inline_keyboard=[lst, [btn3]])
+    lst1 = [[m] for m in lst]
+    builder = InlineKeyboardMarkup(inline_keyboard=[*lst1, [btn3]])
     return builder

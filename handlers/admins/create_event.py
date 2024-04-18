@@ -32,7 +32,6 @@ async def second(callback: types.CallbackQuery):
     ev = admin.c_events
     tests = admin.c_tests
     date = (admin.data_end).strftime('%Y-%m-%d')
-    print(type(date))
     await callback.message.answer(f"""ℹ️Остатки по пакету - 
 🌟Мероприятий осталось - <b>{ev}</b>
 🌟Тестов осталось - <b>{tests}</b>

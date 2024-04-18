@@ -29,7 +29,7 @@ async def get_current(id_event, id_test):
     events = await get_all_tests()
     for i, event in enumerate(events):
         if event.id_test == id_test:
-            print("test - ", event)
+
             return event
     return 0
 

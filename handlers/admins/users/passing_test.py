@@ -51,7 +51,7 @@ def get_set(state):
 async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: Take_quest):
     global test_result
     id_quest = callback_data.id
-    print("id_quest - ", id_quest)
+
     current_quest = await questions.get_current(id_quest)
     await state.update_data(current_quest=id_quest)
     text = current_quest.text

@@ -43,7 +43,7 @@ async def second(query: CallbackQuery, state: FSMContext):
 @router.callback_query(Current.rebuild_quest, F.data == "ikb_add_new_variant")
 async def second(query: CallbackQuery, state: FSMContext):
     await query.message.answer("🔠Введите новый вариант ответа") # todo бэк
-    await state.set_state(Current.variants_new)
+    await state.set_state(Current.rebuild_variants_new)
 
 
 @router.callback_query(Current.rebuild_quest, F.data == "ikb_clear_all_vars")
@@ -52,12 +52,14 @@ async def second(query: CallbackQuery, state: FSMContext):
     await state.update_data(correct=None)
 
     data = await state.get_data()
-    text = data.get("question")
     question_id = data.get("current_quest")
     current_quest = await questions.get_current(question_id)
+    text = current_quest.text
+    await questions.change_vars(question_id, None)
+    await questions.change_correct(question_id, None)
 
     await query.message.answer(f"""✔️Варианты ответов успешно удалены""")
-    await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>{"множественным правильным ответом" if  current_quest.type == 2 else "единственным правильным ответом"}</b>
+    await query.message.answer(f"""🛠️Вы в редакторе вопроса {current_quest.id_quest} c <b>{"множественным правильным ответом" if  current_quest.type == 2 else "единственным правильным ответом"}</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -73,7 +75,11 @@ async def second(query: CallbackQuery, state: FSMContext):
 @router.callback_query(Current.rebuild_quest, F.data == "ikb_delete_one_var")
 async def question(query: CallbackQuery, state:FSMContext):
     data = await state.get_data()
-    variants = (data.get("variants"))
+    id_quest = data.get("current_quest")
+    current_quest = await questions.get_current(id_quest)
+    correct = current_quest.correct_answer
+    text = current_quest.text
+    variants = current_quest.variants
     if variants:
         list_variants = list(map(str, variants.split(".*.")))
         variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
@@ -82,15 +88,12 @@ async def question(query: CallbackQuery, state:FSMContext):
 🎯Введите вариант ответа, который хотите удалить от 1 до {len(list_variants)}""") # todo можно бэк
         await state.set_state(Current.variants_del)
     else:
-        text = data.get("question")
-        correct = data.get("correct")
         if correct:
             list_corrects = list(map(str, correct.split(".*.")))
             correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
-        question_id = data.get("current_quest")
-        current_quest = await questions.get_current(question_id)
+        current_quest = await questions.get_current(id_quest)
         await query.message.answer(f"""⛔Варианты ответов еще не установлены""")
-        await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>{"множественным правильным ответом" if  current_quest.type == 2 else "единственным правильным ответом"}</b>
+        await query.message.answer(f"""🛠️Вы в редакторе вопроса {id_quest} c <b>{"множественным правильным ответом" if  current_quest.type == 2 else "единственным правильным ответом"}</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -108,25 +111,26 @@ async def question(query: CallbackQuery, state:FSMContext):
 async def question(message: Message, state:FSMContext):
     data = await state.get_data()
     num = message.text
+    id_quest = data.get("current_quest")
+    current_quest = await questions.get_current(id_quest)
     try:
         num = int(num)
-        variants = data.get("variants")
+        variants = current_quest.variants
         list_vars = list(map(str, variants.split(".*.")))
         deleted_var = list_vars.pop(num)
         new_vars = ".*.".join(list_vars)
-        text = data.get('question')
-        correct = data.get("correct")
+        correct = current_quest.correct_answer
+        text = current_quest.text
         variants_str = "\n".join(f"{index}. {element}" for index, element in enumerate(list_vars, start=1))
-        await state.update_data(variants=new_vars)
+        await questions.change_vars(id_quest, new_vars)
         if correct:
             list_corrects = list(map(str, correct.split(".*.")))
             correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
         await message.answer(f"""✅Варианты ответов были успешно обновлены. {deleted_var} Был успешно удален
 Текущий список ответов:
 {variants_str if len(list_vars) > 0 else "❌Не заполненно"}""")
-        question_id = data.get("current_quest")
-        current_quest = await questions.get_current(question_id)
-        await message.answer(f"""🛠️Вы в конструкторе вопроса c <b>{"множественным правильным ответом" if  current_quest.type == 2 else "единственным правильным ответом"}</b>
+        current_quest = await questions.get_current(id_quest)
+        await message.answer(f"""🛠️Вы в редакторе вопроса {id_quest} c <b>{"множественным правильным ответом" if  current_quest.type == 2 else "единственным правильным ответом"}</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -150,16 +154,19 @@ async def question(message: Message, state:FSMContext):
     data = await state.get_data()
 
     text = message.text
-    var_old = (data.get("variants"))
-    if var_old:
-        vars = var_old + ".*." + text
-        await state.update_data(variants=vars)
+    id_quest = data.get("current_quest")
+    current_quest = await questions.get_current(id_quest)
+    variants_old = current_quest.variants
+    if variants_old:
+        vars = variants_old + ".*." + text
+        await questions.change_vars(id_quest, vars)
     else:
-        await state.update_data(variants=text)
-    data_new = await state.get_data()
-    variants = data_new.get("variants")
-    text = data_new.get("question")
-    correct = data_new.get("correct")
+        await questions.change_vars(id_quest, text)
+    current_quest = await questions.get_current(id_quest)
+    variants = current_quest.variants
+    correct = current_quest.correct_answer
+    question_text = current_quest.text
+
     if variants:
         list_variants = list(map(str, variants.split(".*.")))
         variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
@@ -168,11 +175,11 @@ async def question(message: Message, state:FSMContext):
         correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
     question_id = data.get("current_quest")
     current_quest = await questions.get_current(question_id)
-    await message.answer(f"""🛠️Вы в конструкторе вопроса c <b>{"множественным правильным ответом" if  current_quest.type == 2 else "единственным правильным ответом"}</b>
+    await message.answer(f"""🛠️Вы в редакторе вопроса {id_quest} c <b>{"множественным правильным ответом" if  current_quest.type == 2 else "единственным правильным ответом"}</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
-{text if text else "❌Не заполненно"}
+{question_text if question_text else "❌Не заполненно"}
 
 <b>Варианты ответа:</b>
 {variants if variants else "❌Не заполненно"}
@@ -211,7 +218,7 @@ async def question(message: Message, state:FSMContext):
     data = await state.get_data()
     id_quest = data.get("current_quest")
     current_test = await questions.get_current(id_quest)
-    print("changing text")
+
     await questions.change_text(id_quest, text)
     variants = list(map(str, current_test.variants.split(".*.")))
     variants = "\n".join(f"{index}) {element}" for index, element in enumerate(variants, start=1))
@@ -222,7 +229,7 @@ async def question(message: Message, state:FSMContext):
         correct = "\n".join(f"{index}. {element}" for index, element in enumerate(correct, start=1))
     else:
         correct = current_test.coorect_answer
-    await message.answer(f"""🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
+    await message.answer(f"""🛠️Вы в редакторе вопроса {id_quest} c <b>единственным правильным ответом</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -266,7 +273,7 @@ async def question(message: Message, state:FSMContext):
         list_variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
 
         text = current_test.text
-        await message.answer(f"""🛠️Вы в конструкторе вопроса c <b>{"единственным правильным ответом" if  current_test.type ==1 else "множественным правильным ответом"}</b>
+        await message.answer(f"""🛠️Вы в редакторе вопроса {id_quest} c <b>{"единственным правильным ответом" if  current_test.type ==1 else "множественным правильным ответом"}</b>
     Предпросмотр вопроса: 
     
     <b>Текст вопроса:</b>
@@ -300,7 +307,7 @@ async def question(message: Message, state:FSMContext):
                 if current_quest.type == 1:
                     await questions.change_correct(id_quest, vars_list[text-1])
                     await message.answer(f"✅Успешно установлен вариант ответа <b>{text}: {vars_list[text-1]}</b>", parse_mode=ParseMode.HTML)
-                    await message.answer(f"""🛠️Вы в конструкторе вопроса c <b>единственным правильным ответом</b>
+                    await message.answer(f"""🛠️Вы в редакторе вопроса {id_quest} c <b>единственным правильным ответом</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -325,7 +332,7 @@ async def question(message: Message, state:FSMContext):
                     list_corrects = list(map(str, corrects_new.split(".*.")))
                     str_corrects = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
 
-                    await message.answer(f"""🛠️Вы в конструкторе вопроса c <b>множественным правильным ответом</b>
+                    await message.answer(f"""🛠️Вы в редакторе вопроса {id_quest} c <b>множественным правильным ответом</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>

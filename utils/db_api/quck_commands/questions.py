@@ -54,7 +54,7 @@ async def change_vars(id_quest, new_vars):
         new_vars = ".*.".join(new_vars)
     else:
         pass
-    print("changing variants func - ", new_vars)
+
     user = await get_current(id_quest=id_quest)
     await user.update(variants=new_vars).apply()
 
@@ -65,7 +65,7 @@ async def change_correct(id_quest, new_correct):
         new_correct = ".*.".join(new_correct)
     else:
         pass
-    print("changing correct func - ", new_correct)
+
     user = await get_current(id_quest=id_quest)
     await user.update(correct_answer=new_correct).apply()
 

@@ -57,7 +57,6 @@ async def first(message: Message):
 💎 100 мероприятий, 20 тестов - 12000 рублей (пакет 8)
 👑 Безлимит - 28000 
 """, reply_markup=ikb_buy_admin(), parse_mode=ParseMode.HTML)
-    print(prices[0])
 
 
 @router.callback_query(Choose_price.filter(F.cb=="ikb_buy"))

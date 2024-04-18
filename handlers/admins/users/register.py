@@ -114,7 +114,7 @@ async def start_test(message: Message, state: FSMContext):
     all_events = await event.get_all_events()
     flag = False
     for ev in all_events:
-        print("code - ", code, "event pass - ", ev.password, code == ev.password, type(code), type(ev.password))
+        # print("code - ", code, "event pass - ", ev.password, code == ev.password, type(code), type(ev.password))
         if ev.password == int(code):
             current_ev = ev
             await state.update_data(current_event=ev.id_event)
@@ -134,7 +134,6 @@ async def start_test(message: Message, state: FSMContext):
 
 @router.callback_query(pick_a_test_user.filter(F.cb=="ikb_current_test"))
 async def start_test(query: CallbackQuery, callback_data: pick_a_test_user, state: FSMContext):
-    print("ЗАШЛО")
     await state.update_data(current_test=callback_data.id)
     id_test = callback_data.id
     current_test = await tests.get_current(1, id_test=id_test)

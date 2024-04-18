@@ -342,9 +342,6 @@ async def second(query: CallbackQuery, state: FSMContext):
     correct = data.get("correct")
     test_id = data.get("current_test")
     types = data.get("type")
-    print(quest)
-    print(vars)
-    print(correct)
     all_quests = await questions.get_all_quest()
     if quest and vars and correct:
         try:

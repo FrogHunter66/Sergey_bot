@@ -146,7 +146,7 @@ async def question(message: Message, state:FSMContext):
 
         variants_str = "\n".join(f"{index}. {element}" for index, element in enumerate(list_vars, start=1))
         await state.update_data(variants=new_vars)
-        print(variants_str)
+
         await message.answer(f"""✅Варианты ответов были успешно обновлены. {deleted_var} Был успешно удален
 Текущий список ответов:
 {variants_str if len(list_vars) > 0 else "❌Не заполненно"}""")

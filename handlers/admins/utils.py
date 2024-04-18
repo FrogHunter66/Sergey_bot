@@ -377,6 +377,25 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Current.current_test)
 
 
+@router.callback_query(Current.current_test, F.data == "ikb_back_all_questions")
+async def add_test2(query: types.CallbackQuery, state: FSMContext):
+    data_state = await state.get_data()
+    name = data_state.get("event")
+    num = data_state.get("setting_name")
+    await query.message.answer(f"⚡Выберите действие для теста <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
+
+
+@router.callback_query(Current.event, F.data == "ikb_back_all_questions")
+async def add_test2(query: types.CallbackQuery, state: FSMContext):
+    data_state = await state.get_data()
+    name = data_state.get("event")
+    num = data_state.get("setting_name")
+    await state.update_data(current_test=num)
+    await query.message.answer(f"⚡Выберите действие для теста <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
+
+
+
+
 @router.callback_query(F.data == "back_to_rebuild_test", Current.event)
 async def second(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
@@ -432,28 +451,9 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(Current.event)
     data = await state.get_data()
     id = data.get("event_id")
-    print("id ", id)
+
     kb = await ikb_all_tests(id)
     await callback.message.answer("📋Список тестов", reply_markup=kb)
-
-
-
-@router.callback_query(Current.current_test, F.data == "ikb_back_all_questions")
-async def add_test2(query: types.CallbackQuery, state: FSMContext):
-    data_state = await state.get_data()
-    name = data_state.get("event")
-    num = data_state.get("setting_name")
-    await state.update_data(current_test=num)
-    await query.message.answer(f"⚡Выберите действие для теста <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
-
-
-@router.callback_query(Current.event, F.data == "ikb_back_all_questions")
-async def add_test2(query: types.CallbackQuery, state: FSMContext):
-    data_state = await state.get_data()
-    name = data_state.get("event")
-    num = data_state.get("setting_name")
-    await state.update_data(current_test=num)
-    await query.message.answer(f"⚡Выберите действие для теста <b>{num}</b> в мероприятии <b>{name}</b>", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "ikb_back")
