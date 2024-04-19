@@ -299,10 +299,11 @@ async def second(query: types.CallbackQuery, state: FSMContext):
     text = data.get("question")
     variants = data.get("variants")
     correct = data.get("correct")
+    quest_type = data.get("type")
     if variants:
         list_variants = list(map(str, variants.split(".*.")))
         variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
-    await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>{"множественным правильным ответом" if  current_quest.type == 2 else "единственным правильным ответом"}</b>
+    await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>{"множественным правильным ответом" if  quest_type == 2 else "единственным правильным ответом"}</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>
@@ -322,11 +323,17 @@ async def second(query: types.CallbackQuery, state: FSMContext):
     variants = data.get("variants")
     id_quest = data.get("current_quest")
     correct = data.get("correct")
-    current_test = await questions.get_current(id_quest)
+
+    current_quest1 = data.get("type")
+    current_quest = await questions.get_current(id_quest)
+    if current_quest1:
+        quest_type = current_quest1
+    else:
+        quest_type = current_quest.type
     if variants:
         list_variants = list(map(str, variants.split(".*.")))
         variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
-    await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>{"множественным правильным ответом" if  current_quest.type == 2 else "единственным правильным ответом"}</b>
+    await query.message.answer(f"""🛠️Вы в конструкторе вопроса c <b>{"множественным правильным ответом" if  quest_type == 2 else "единственным правильным ответом"}</b>
 Предпросмотр вопроса: 
 
 <b>Текст вопроса:</b>

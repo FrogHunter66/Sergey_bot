@@ -209,8 +209,10 @@ async def rebuild_current_quest(querry: CallbackQuery, state: FSMContext, callba
     await state.set_state(Current.rebuild_quest)
     if curr_quest: #todo Нужна новая клавиатура которая позволит удалять вопрос, очищать данные вопроса по отдельности, запись данных напрямую в бд без создания нового вопроса
         varss = curr_quest.variants
-        vars = list(map(str, varss.split(".*.")))
-        vars = "\n".join(f"{index}. {element}" for index, element in enumerate(vars, start=1))
+        vars = None
+        if varss:
+            vars = list(map(str, varss.split(".*.")))
+            vars = "\n".join(f"{index}. {element}" for index, element in enumerate(vars, start=1))
         if curr_quest.type == 2:
             correct = list(map(str, curr_quest.correct_answer.split(".*.")))
             correct = "\n".join(f"{index}. {element}" for index, element in enumerate(correct, start=1))
@@ -218,13 +220,13 @@ async def rebuild_current_quest(querry: CallbackQuery, state: FSMContext, callba
 Выберите что бы вы хотели изменить:
 
 <b>Текст вопроса</b>
-{curr_quest.text if curr_quest.text else "Не заполненно"}
+{curr_quest.text if curr_quest.text else "❌Не заполненно"}
 
 <b>Варианты ответа</b>
-{vars if vars else "Не заполненно"}
+{vars if vars else "❌Не заполненно"}
 
 <b>Правильный ответ</b>
-{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
             await state.update_data(question=curr_quest.text)
             await state.update_data(type=2)
             await state.update_data(variants=vars)
@@ -235,13 +237,13 @@ async def rebuild_current_quest(querry: CallbackQuery, state: FSMContext, callba
 Выберите что бы вы хотели изменить:
 
 <b>Текст вопроса</b>
-{curr_quest.text if curr_quest.text else "Не заполненно"}
+{curr_quest.text if curr_quest.text else "❌Не заполненно"}
 
 <b>Варианты ответа</b>
-{vars if vars else "Не заполненно"}
+{vars if vars else "❌Не заполненно"}
 
 <b>Правильный ответ</b>
-{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
             await state.update_data(question=curr_quest.text)
             await state.update_data(type=1)
             await state.update_data(variants=vars)
@@ -276,10 +278,10 @@ async def second(query: CallbackQuery, state: FSMContext):
 Выберите что бы вы хотели изменить:
 
 <b>Текст вопроса</b>
-{text if text else "Не заполненно"}
+{text if text else "❌Не заполненно"}
 
 <b>Варианты ответа</b>
-{variants if variants else "Не заполненно"}
+{variants if variants else "❌Не заполненно"}
 
 <b>Правильный ответ</b>
-{correct if correct else "Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_rebuild_qustion(), parse_mode=ParseMode.HTML)#parse_mode_был

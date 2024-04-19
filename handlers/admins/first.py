@@ -143,7 +143,9 @@ async def question(message: Message, state:FSMContext):
         new_vars = ".*.".join(list_vars)
         text = data.get('question')
         correct = data.get("correct")
-
+        if deleted_var == correct:
+            await state.update_data(correct=None)
+            correct = None
         variants_str = "\n".join(f"{index}. {element}" for index, element in enumerate(list_vars, start=1))
         await state.update_data(variants=new_vars)
 
@@ -157,11 +159,10 @@ async def question(message: Message, state:FSMContext):
 {text if text else "❌Не заполненно"}
 
 <b>Варианты ответа:</b>
-{variants_str if variants else "❌Не заполненно"}
+{variants_str if list_vars else "❌Не заполненно"}
 
 <b>Правильный ответ:</b>
-{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(),
-                             parse_mode=ParseMode.HTML)  # p
+{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)  # p
         await state.set_state(Current.event)
 
     except:

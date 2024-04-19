@@ -75,18 +75,19 @@ async def second(query: CallbackQuery, state: FSMContext):
 @router.callback_query(Current.rebuild_quest, F.data == "ikb_delete_one_var")
 async def question(query: CallbackQuery, state:FSMContext):
     data = await state.get_data()
+    print("INFO:DELETED ONE VARIANT")
     id_quest = data.get("current_quest")
     current_quest = await questions.get_current(id_quest)
     correct = current_quest.correct_answer
     text = current_quest.text
     variants = current_quest.variants
+    await state.set_state(Current.rebuild_variants_del)
     if variants:
         list_variants = list(map(str, variants.split(".*.")))
         variants = "\n".join(f"{index}. {element}" for index, element in enumerate(list_variants, start=1))
         await query.message.answer(f"""🔠Текущие установленные варианты:
 {variants}
 🎯Введите вариант ответа, который хотите удалить от 1 до {len(list_variants)}""") # todo можно бэк
-        await state.set_state(Current.variants_del)
     else:
         if correct:
             list_corrects = list(map(str, correct.split(".*.")))
@@ -109,22 +110,31 @@ async def question(query: CallbackQuery, state:FSMContext):
 
 @router.message(Current.rebuild_variants_del, Admin())
 async def question(message: Message, state:FSMContext):
+    print("INFO:DELETED ONE VARIANT MESSAGE")
     data = await state.get_data()
     num = message.text
     id_quest = data.get("current_quest")
     current_quest = await questions.get_current(id_quest)
     try:
-        num = int(num)
+        num = int(num)-1
         variants = current_quest.variants
         list_vars = list(map(str, variants.split(".*.")))
+        print("list_vars", list_vars)
+        print("index", num)
         deleted_var = list_vars.pop(num)
         new_vars = ".*.".join(list_vars)
         correct = current_quest.correct_answer
         text = current_quest.text
         variants_str = "\n".join(f"{index}. {element}" for index, element in enumerate(list_vars, start=1))
         await questions.change_vars(id_quest, new_vars)
+        list_corrects = None
         if correct:
             list_corrects = list(map(str, correct.split(".*.")))
+            if deleted_var in list_corrects:
+                i = list_corrects.index(deleted_var)
+                list_corrects.pop(i)
+            new_corrects = ".*.".join(list_corrects)
+            await questions.change_correct(id_quest, new_corrects)
             correct = "\n".join(f"{index}. {element}" for index, element in enumerate(list_corrects, start=1))
         await message.answer(f"""✅Варианты ответов были успешно обновлены. {deleted_var} Был успешно удален
 Текущий список ответов:
@@ -137,14 +147,15 @@ async def question(message: Message, state:FSMContext):
 {text if text else "❌Не заполненно"}
 
 <b>Варианты ответа:</b>
-{variants_str if variants else "❌Не заполненно"}
+{variants_str if len(list_vars)>0 else "❌Не заполненно"}
 
 <b>Правильный ответ:</b>
-{correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(),
+{correct if list_corrects else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(),
                              parse_mode=ParseMode.HTML)  # p
         await state.set_state(Current.rebuild_quest)
 
-    except:
+    except Exception as err:
+        print(err)
         await message.answer(f"""❌Вы ввели некорректный вариант ответа для удаления, 
 Введите еще раз вариант ответа, который хотите удалить или вернитесь назад↩️""", reply_markup=ikb_back()) #todo БЭК
 
