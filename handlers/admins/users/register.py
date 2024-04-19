@@ -91,16 +91,16 @@ async def take_quest(query: CallbackQuery, callback_data: Current_lks):
             pluses = (result.result).count('1')
             minuses = (result.result).count('0')
             await query.message.answer(f"""Мероприятие: <b>{ev.name}</b>
-    📋Тест: <b>{name}</b>
+📋Тест: <b>{name}</b>
             
-    🎯 Процент выполнения - <b>{pluses/(pluses+minuses)//1}</b>
+🎯 Процент выполнения - <b>{pluses/(pluses+minuses)//1}</b>
     
-    ✅ Правильных ответов - <b>{pluses}</b>
+✅ Правильных ответов - <b>{pluses}</b>
     
-    ❌ Неправильных овтеты - <b>{minuses}</b>
+❌ Неправильных овтеты - <b>{minuses}</b>
     
     
-    #result""", parse_mode=ParseMode.HTML)
+#result""", parse_mode=ParseMode.HTML)
     else:
         await query.message.answer("⛔Вы еще не прошли ни одного теста")
 
@@ -142,12 +142,15 @@ async def start_test(query: CallbackQuery, callback_data: pick_a_test_user, stat
     current_time = current_time.replace(tzinfo=datetime.timezone.utc, microsecond=0)
     end_time = current_test.end_time.replace(microsecond=0)
     differ = end_time - current_time
+    days = differ.days
+    hours, remainder = divmod(differ.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
     if current_time < end_time:
         await query.message.answer(f"""🎬Готовы ли вы приступить к началу тестирования?
-📝Название теста - {current_test.name}
-🕘Время на прохождение теста ограниченно - {current_test.lifetime}
-🕘Время до конца существования теста - {differ}
-🔢Количество вопросов - {len(count_quests)}""", reply_markup=ikb_start_test(), parse_mode=ParseMode.HTML)
+📝Название теста - <b>{current_test.name}</b>
+🕘Время на выполнение теста ограниченно - <b>{current_test.bound_time} минут</b>
+🕘Время до конца существования теста - <b>{days} д {hours:02}:{minutes:02}:{seconds:02}</b>
+🔢Количество вопросов - <b>{len(count_quests)}</b>""", reply_markup=ikb_start_test(), parse_mode=ParseMode.HTML)
     else:
         await query.message.answer(f"⛔Тест больше не доступен. Время существования теста истекло")
 

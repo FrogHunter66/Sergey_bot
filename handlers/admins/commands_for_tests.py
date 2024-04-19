@@ -1,3 +1,5 @@
+import datetime
+
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router, F
 from aiogram.enums.dice_emoji import DiceEmoji
@@ -48,14 +50,28 @@ def decode_lifetime(lifetime):
 async def second(query: CallbackQuery, callback_data: Choose_test, state: FSMContext):
     data_state = await state.get_data()
     id = data_state.get("event_id")
-    data = await tests.get_current(id_event=id, id_test=callback_data.id)
-    num = data.id_test
+    current_test = await tests.get_current(id_event=id, id_test=callback_data.id)
+    num = current_test.id_test
     name = data_state.get("event")
+    bound = current_test.bound_time
+    current_time = datetime.datetime.utcnow()
+    current_time = current_time.replace(tzinfo=datetime.timezone.utc, microsecond=0)
+    end_time = current_test.end_time.replace(microsecond=0)
+    differ = end_time - current_time
+    days = differ.days
+    hours, remainder = divmod(differ.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+
     await state.update_data(current_test=num)
-    await state.update_data(setting_name=data.name)
-    await query.message.answer(f"""<b>Вы в панели действий для теста</b> {data.name} 
+    await state.update_data(setting_name=current_test.name)
+    await query.message.answer(f"""<b>Вы в панели действий для теста</b> {current_test.name} 
 
 <b>Мероприятия</b> {name}
+
+<b>Текущие настройки:</b>
+🕒<b>Время на выполнение</b> теста: {bound} минут
+🕒<b>Время существования</b> теста: {days} д {hours:02}:{minutes:02}:{seconds:02}
 
 ⚡<b>Выберите действие</b>⚡""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
@@ -124,13 +140,13 @@ async def add_test3(message: Message, state: FSMContext):
         await state.set_state(Current.current_test)
         await message.answer(f"✅Время на прохождения теста успешно установлено: *{code}* минут", parse_mode=ParseMode.MARKDOWN_V2)
         await message.answer(f"""📝<b>Название теста:</b> {current_test.name if current_test.name else "⛔Пока не определен"}  
-🕒<b>Время на прохождение</b> теста: {code} минут
+🕒<b>Время на выполнение</b> теста: {code} минут
 🕒<b>Время существования</b> теста: {decode_lifetime(current_test.lifetime)}""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     except:
         await state.set_state(Current.current_test)
         await message.answer("❌Время может быть *только численнного* формата", parse_mode=ParseMode.MARKDOWN_V2)
         await message.answer(f"""📝<b>Название теста:</b> {current_test.name if current_test.name else "⛔Пока не определен"}  
-🕒<b>Время на прохождение</b> теста: {current_test.bound_time if current_test.bound_time else "⛔Пока не определен"} минут
+🕒<b>Время на выполнение</b> теста: {current_test.bound_time if current_test.bound_time else "⛔Пока не определен"} минут
 🕒<b>Время существования</b> теста: {decode_lifetime(current_test.lifetime)}""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
 
 
@@ -144,7 +160,7 @@ async def add_test3(message: Message, state: FSMContext):
     await tests.update_name(id_test=id_test, id_event=1, new_name=code)
     await message.answer(f"✅Название теста успешно установлено <b>{code}</b>", parse_mode=ParseMode.HTML)
     await message.answer(f"""📝<b>Название теста:</b> {code}  
-🕒<b>Время на прохождение</b> теста: {current_test.bound_time if current_test.bound_time else "⛔Пока не определен"} минут
+🕒<b>Время на выполнение</b> теста: {current_test.bound_time if current_test.bound_time else "⛔Пока не определен"} минут
 🕒<b>Время существования</b> теста: {decode_lifetime(current_test.lifetime)}""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
 
@@ -161,7 +177,7 @@ async def add_test2(query: CallbackQuery, state: FSMContext, callback_data: Choo
     await tests.update_lifetime(id_event=id_ev, id_test=test_id, new_time=callback_data.id)
     await query.message.answer(f"✅Время существования теста успешно установлено {decode_lifetime(callback_data.id)}", parse_mode=ParseMode.MARKDOWN_V2)
     await query.message.answer(f"""📝<b>Название теста:</b> {current_test.name if current_test.name else "⛔Пока не определен"}  
-🕒<b>Время на прохождение</b> теста: {current_test.bound_time if current_test.bound_time else "⛔Пока не определен"} минут
+🕒<b>Время на выполнение</b> теста: {current_test.bound_time if current_test.bound_time else "⛔Пока не определен"} минут
 🕒<b>Время существования</b> теста: {decode_lifetime(callback_data.id)}""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
 
@@ -185,11 +201,11 @@ async def rebuild_current_quest(querry: CallbackQuery, state: FSMContext, callba
     if curr_quest: #todo Нужна новая клавиатура которая позволит удалять вопрос, очищать данные вопроса по отдельности, запись данных напрямую в бд без создания нового вопроса
         varss = curr_quest.variants
         vars = list(map(str, varss.split(".*.")))
-        vars = "\n".join(f"{index}) {element}" for index, element in enumerate(vars, start=1))
+        vars = "\n".join(f"{index}. {element}" for index, element in enumerate(vars, start=1))
         if curr_quest.type == 2:
             correct = list(map(str, curr_quest.correct_answer.split(".*.")))
-            correct = "\n".join(f"{index}) {element}" for index, element in enumerate(correct, start=1))
-            await querry.message.answer(f"""🛠️Вы в редакторе вопроса {curr_quest.id_quest} с выбором <b>{"единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}</b> 
+            correct = "\n".join(f"{index}. {element}" for index, element in enumerate(correct, start=1))
+            await querry.message.answer(f"""🛠️Вы в редакторе вопроса с выбором <b>{"единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}</b> 
 Выберите что бы вы хотели изменить:
 
 <b>Текст вопроса</b>
@@ -206,7 +222,7 @@ async def rebuild_current_quest(querry: CallbackQuery, state: FSMContext, callba
             await state.update_data(correct=correct)
         elif curr_quest.type == 1:
             correct = curr_quest.correct_answer
-            await querry.message.answer(f"""🛠️Вы в редакторе вопроса {curr_quest.id_quest} с выбором <b>{" единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}</b>
+            await querry.message.answer(f"""🛠️Вы в редакторе вопроса с выбором <b>{" единственного правильно ответа" if curr_quest.type == 1 else " множественного правильного ответа "}</b>
 Выберите что бы вы хотели изменить:
 
 <b>Текст вопроса</b>
@@ -247,8 +263,7 @@ async def second(query: CallbackQuery, state: FSMContext):
     except Exception as err:
         await log_exceptions1("change_quest", "ERROR", "commands_for_tests.py", 285, err, query.from_user.id)
         await query.message.answer("❌Произошла ошибка")
-        await query.message.answer(
-f"""🛠️Вы в редакторе вопроса {id_quest} с выбором <b>{" единственного правильно ответа" if typee == 1 else " множественного правильного ответа "}</b>
+        await query.message.answer(f"""🛠️Вы в редакторе вопроса с выбором <b>{" единственного правильно ответа" if typee == 1 else " множественного правильного ответа "}</b>
 Выберите что бы вы хотели изменить:
 
 <b>Текст вопроса</b>

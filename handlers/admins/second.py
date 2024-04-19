@@ -47,10 +47,10 @@ async def second(query: CallbackQuery, state: FSMContext):
 
 <b>Текст вопроса:</b>
 {text if text else "❌Не заполненно"}
-------------------------------------------------------
+
 <b>Варианты ответа:</b>
 {variants if variants else "❌Не заполненно"}
-------------------------------------------------------
+
 <b>Правильные ответы:</b>
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(),parse_mode=ParseMode.HTML)
         await state.set_state(Current2.event)
@@ -73,7 +73,7 @@ async def second(query: CallbackQuery, state: FSMContext):
 @router.callback_query(Current2.event, F.data == "ikb_add_new_variant")
 async def second(query: CallbackQuery, state: FSMContext):
     await query.message.answer("🔠Введите новый вариант ответа") # todo бэк
-    await state.set_state(Current.variants_new)
+    await state.set_state(Current2.variants_new)
 
 
 @router.callback_query(Current2.event, F.data == "ikb_clear_all_vars")
@@ -126,7 +126,7 @@ async def question(query: CallbackQuery, state:FSMContext):
 
 <b>Правильный ответ:</b>
 {correct if correct else "❌Не заполненно"}""", reply_markup=ikb_actions_qustion(), parse_mode=ParseMode.HTML)
-        await state.set_state(Current.event)
+        await state.set_state(Current2.event)
 
 
 @router.message(Current2.variants_del, Admin())
