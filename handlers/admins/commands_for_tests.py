@@ -63,7 +63,7 @@ async def second(query: CallbackQuery, callback_data: Choose_test, state: FSMCon
     minutes, seconds = divmod(remainder, 60)
     await state.update_data(current_test=num)
     await state.update_data(setting_name=current_test.name)
-    if differ < 0:
+    if end_time < current_time:
         await query.message.answer(f"""<b>Вы в панели действий для теста</b> {current_test.name} 
 
 <b>Мероприятия</b> {name}
