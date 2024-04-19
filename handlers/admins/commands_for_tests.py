@@ -61,8 +61,6 @@ async def second(query: CallbackQuery, callback_data: Choose_test, state: FSMCon
     days = differ.days
     hours, remainder = divmod(differ.seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
-
-
     await state.update_data(current_test=num)
     await state.update_data(setting_name=current_test.name)
     if differ < 0:
