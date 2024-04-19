@@ -65,14 +65,25 @@ async def second(query: CallbackQuery, callback_data: Choose_test, state: FSMCon
 
     await state.update_data(current_test=num)
     await state.update_data(setting_name=current_test.name)
-    await query.message.answer(f"""<b>Вы в панели действий для теста</b> {current_test.name} 
+    if differ < 0:
+        await query.message.answer(f"""<b>Вы в панели действий для теста</b> {current_test.name} 
 
 <b>Мероприятия</b> {name}
 
 <b>Текущие настройки:</b>
 🕒<b>Время на выполнение</b> теста: {bound} минут
-🕒<b>Время существования</b> теста: {days} д {hours:02}:{minutes:02}:{seconds:02}
+🕒<b>Время существования</b> теста: ⛔Истекло 
 
+⚡<b>Выберите действие</b>⚡""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
+    else:
+        await query.message.answer(f"""<b>Вы в панели действий для теста</b> {current_test.name} 
+    
+<b>Мероприятия</b> {name}
+    
+<b>Текущие настройки:</b>
+🕒<b>Время на выполнение</b> теста: {bound} минут
+🕒<b>Время существования</b> теста: {days} д {hours:02}:{minutes:02}:{seconds:02}
+    
 ⚡<b>Выберите действие</b>⚡""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
     await state.update_data(event=name)

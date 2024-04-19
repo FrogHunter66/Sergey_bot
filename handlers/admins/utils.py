@@ -363,7 +363,9 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
 
 
 #-----------------------------------------------------
-
+# <b>Текущие настройки</b>
+# 🕒<b>Время на выполнение</b> теста: {bound} минут
+# 🕒<b>Время существования</b> теста до: {days} д {hours:02}:{minutes:02}:{seconds:02}
 
 @router.callback_query(F.data == "ikb_back", Current.setting_time2)
 async def second(callback: types.CallbackQuery, state: FSMContext):
@@ -380,13 +382,10 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     days = differ.days
     hours, remainder = divmod(differ.seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
+
     await callback.message.answer(f"""<b>Вы в панели действий для теста</b> {current_test.name} 
 
 <b>Мероприятия</b> {name}
-
-<b>Текущие настройки</b>
-🕒<b>Время на выполнение</b> теста: {bound} минут
-🕒<b>Время существования</b> теста до: {days} д {hours:02}:{minutes:02}:{seconds:02}
 
 ⚡<b>Выберите действие</b>⚡""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.HTML)
     await state.set_state(Current.current_test)
