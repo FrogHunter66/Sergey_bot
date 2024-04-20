@@ -65,14 +65,15 @@ async def first(message: Message, state: FSMContext):
     name = message.text
     await state.update_data(first_name=name)
     await state.update_data(username="@" + message.from_user.username)
-    await message.answer(f"👋Привет, {name}, напишите код доступа к мероприятию, чтобы получить доступ к тестам.", reply_markup=ikb_lks(message.from_user.id))
+    await message.answer(f"👋Привет, <b>{name}</b>, напишите код доступа к мероприятию, чтобы получить доступ к тестам.", reply_markup=ikb_lks(message.from_user.id), parse_mode=ParseMode.HTML)
     await state.set_state(User.test_code)
+
 
 @router.message(Command("start"), Old_user())
 async def first(message: Message, state: FSMContext):
     user = await users.get_current_user(message.from_user.id)
     name = user.first_name
-    await message.answer(f"""👋Привет, {name}, напишите код доступа к мероприятию, чтобы получить доступ к тестам.""", parse_mode=ParseMode.HTML, reply_markup=ikb_lks(message.from_user.id))
+    await message.answer(f"""👋Привет, <b>{name}</b>, напишите код доступа к мероприятию, чтобы получить доступ к тестам.""", parse_mode=ParseMode.HTML, reply_markup=ikb_lks(message.from_user.id))
     await state.set_state(User.test_code)
     await state.update_data(first_name=name)
     await state.update_data(username="@" + message.from_user.username)
@@ -90,10 +91,10 @@ async def take_quest(query: CallbackQuery, callback_data: Current_lks):
             ev = await event.get_event(id=current_test.id_event)
             pluses = (result.result).count('1')
             minuses = (result.result).count('0')
-            await query.message.answer(f"""Мероприятие: <b>{ev.name}</b>
+            await query.message.answer(f"""Мероприятие: <b>{ev.event_name}</b>
 📋Тест: <b>{name}</b>
             
-🎯 Процент выполнения - <b>{pluses/(pluses+minuses)//1}</b>
+🎯 Процент выполнения - <b>{round(pluses/(pluses+minuses), 2)}</b>
     
 ✅ Правильных ответов - <b>{pluses}</b>
     
@@ -104,7 +105,7 @@ async def take_quest(query: CallbackQuery, callback_data: Current_lks):
     else:
         await query.message.answer("⛔Вы еще не прошли ни одного теста")
 
-    await query.message.answer("🔓Введите код доступа к мероприятию, чтобы получить доступ к тестам", reply_markup=ikb_lks(query.message.from_user.id))
+    await query.message.answer("🔓Введите код доступа к мероприятию, чтобы получить доступ к тестам", reply_markup=ikb_lks(query.from_user.id))
 
 
 @router.message(User.test_code, Old_user())
@@ -122,13 +123,13 @@ async def start_test(message: Message, state: FSMContext):
             break
     if flag:
         kb = await ikb_all_tests_event_user(current_ev.id_event)
-        await message.answer(f"""Список всех тестов мероприятия <b>{current_ev.event_name}</b>""", parse_mode=ParseMode.HTML, reply_markup=kb)
+        await message.answer(f"""📋Список всех тестов мероприятия <b>{current_ev.event_name}</b>""", parse_mode=ParseMode.HTML, reply_markup=kb)
         await state.set_state(User.current_test)
 
     else:
         await message.answer("❌По данному коду не было найденно тестов", reply_markup=ikb_back_code())
         name = data.get("first_name")
-        await message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти.")
+        await message.answer(f"👋Привет, <b>{name}</b>, напишите код доступа к тесту, чтобы его пройти.", reply_markup=ikb_lks(message.from_user.id), parse_mode=ParseMode.HTML)
 
 
 
@@ -170,10 +171,17 @@ async def second(query: CallbackQuery, state: FSMContext):
     await query.message.answer(f"👉Выберите вопрос", reply_markup=kb)
 
 
+@router.callback_query(F.data == "ikb_exit_event", User.current_test, Old_user())
+async def second(query: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    name = data.get("first_name")
+    await query.message.answer(f"👋Привет, <b>{name}</b>, напишите код доступа к тесту, чтобы его пройти.", parse_mode=ParseMode.HTML, reply_markup=ikb_lks(query.from_user.id))
+
+
 @router.callback_query(F.data == "ikb_back_code", User.test_code, Old_user())
 async def second(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     name = data.get("first_name")
-    await query.message.answer(f"👋Привет, {name}, напишите код доступа к тесту, чтобы его пройти.")
+    await query.message.answer(f"👋Привет, <b>{name}</b>, напишите код доступа к тесту, чтобы его пройти.", parse_mode=ParseMode.HTML, reply_markup=ikb_lks(query.from_user.id))
 
 

@@ -16,9 +16,9 @@ async def ikb_get_all_quests(id_test):
     lst = list()
     for i, event in enumerate(events):
         cb = Take_quest(cb="ikb_quest", id=event.id_quest).pack()
-        btn1 = InlineKeyboardButton(text=f"{i+1} - й вопрос",
-                                    callback_data=cb)
+        btn1 = InlineKeyboardButton(text=f"{i+1} - й вопрос", callback_data=cb)
         lst.append(btn1)
-    btn3 = (InlineKeyboardButton(text="🏁Заврешить тест", callback_data=f"ikb_finish"))
-    builder = InlineKeyboardMarkup(inline_keyboard=[lst, [btn3]])
+    btn3 = (InlineKeyboardButton(text="🏁Завершить тест", callback_data=f"ikb_finish"))
+    lst1 = [[m] for m in lst]
+    builder = InlineKeyboardMarkup(inline_keyboard=[*lst1, [btn3]])
     return builder
