@@ -6,6 +6,8 @@ from aiogram.types import CallbackQuery
 import datetime
 from filters.Old_User import Old_user
 from aiogram.fsm.context import FSMContext
+
+from set_logs1.logger_all1 import log_exceptions1
 from states.fsm import User
 from keyboard.users_kb.ikb_pass_test import ikb_pass_test, answer
 from keyboard.users_kb.ikb_choose_quests import ikb_get_all_quests, Take_quest
@@ -51,7 +53,6 @@ def get_set(state):
 async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: Take_quest):
     global test_result
     id_quest = callback_data.id
-
     current_quest = await questions.get_current(id_quest)
     await state.update_data(current_quest=id_quest)
     text = current_quest.text
@@ -77,14 +78,13 @@ async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: Tak
 {variants}""", reply_markup=kb, parse_mode=ParseMode.HTML)
         elif type_quest == 2:
             kb = await ikb_pass_test(id_quest, mark)
-
             await query.message.answer(f"""🔢Вопрос <b>со множественным выбором ответа.</b>
 🕒Время до заврешения теста - {differ}
             
 {text}
 {variants}""", reply_markup=kb, parse_mode=ParseMode.HTML)
         else:
-            await query.message.answer("Еще какой то тип вопроса")
+            await query.message.answer("⛔Произошла ошибка во время выполнения теста")
         await state.set_state(User.answer)
     else:
         await query.message.answer("⏰Время на выполнение теста вышло")
@@ -114,7 +114,7 @@ async def take_quest(query: CallbackQuery, state: FSMContext, callback_data: ans
         except:
             test_result[id_quest] = str(current_ans)
     else:
-        await query.message.answer("Так не бывает")
+        await query.message.answer("⛔Произошла ошибка во время выполнения теста")
 
     try:
         mark = test_result.get(id_quest)
@@ -150,8 +150,7 @@ async def get_final_result(all_quests):
 
     result_pluses = 0
     result_minuses = 0
-
-    global test_result
+    print("TEST RESULT", test_result)
     for quest in all_quests:
         if quest.type == 1:
             correct = quest.correct_answer
@@ -170,29 +169,16 @@ async def get_final_result(all_quests):
             correct = list(map(str, correct.split(".*.")))
             variants = quest.variants
             variants = list(map(str, variants.split(".*.")))
-            nums = list()
-            for cor in correct:
-                nums.append(str(variants.index(cor) + 1))
-            try:
-                user_answers = test_result.get(quest.id_quest)
-                user_answers = [m for m in user_answers]
-                flag = True
-
-                for answer in user_answers:
-                    if answer not in nums:
-                        flag = False
-                        lst_res.append(0)
-                        result_minuses += 1
-                        break
-                if flag:
-                    lst_res.append(1)
-                    result_pluses += 1
-                else:
-                    lst_res.append(0)
-                    result_minuses += 1
-            except:
-                lst_res.append(0)
-                result_minuses += 1
+            nums = str(test_result.get(quest.id_quest))
+            print("INFO", correct, variants, nums)
+            flag = True
+            for i in nums:
+                if variants[int(i) - 1] not in correct:
+                    flag = False
+                    print("FOR INCORRECT", variants[int(i) - 1])
+                    break
+            if flag: result_pluses += 1
+            else: result_minuses += 1
     test_result.clear()
     return lst_res
 
@@ -215,11 +201,11 @@ async def save(query: CallbackQuery, state: FSMContext):
 
 Тест <b>{test.name}</b>:
 
-✅ Правильных ответов - {pluses}
+🎯 Выполнение - <b>{(pluses / len(all_quests) * 100) // 1} % </b>
+
+✅ Правильных ответов - <b>{pluses}</b>
     
-❌ Неправильных ответов - {minuses}
-    
-🎯 Выполнение - {(pluses / len(all_quests) * 100) // 1} %
+❌ Неправильных ответов - <b>{len(all_quests) - pluses}</b>
     
     
 #results""", parse_mode=ParseMode.HTML)
@@ -228,12 +214,14 @@ async def save(query: CallbackQuery, state: FSMContext):
 
     await query.message.answer(f"""📊Ваш результат: 
 
-✅ Правильных ответов - {pluses} 
+Тест <b>{test.name}</b>:
 
-❌ Неправильных ответов - {minuses}
+🎯 Выполнения - <b>{(pluses / len(all_quests) * 100)//1} %</b>
 
-🎯 Выполнения - {(pluses / len(all_quests) * 100)//1} %
+✅ Правильных ответов - <b>{pluses} </b>
+
+❌ Неправильных ответов - <b>{len(all_quests) - pluses}</b>
 
 
-#results""")
+#results""", parse_mode=ParseMode.HTML)
     await state.clear()

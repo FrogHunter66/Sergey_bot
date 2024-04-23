@@ -5,13 +5,14 @@ from loader import dp
 
 async def log_exceptions1(func_name, level, file_name="", num=0, log_message='', user_id=''):
     try:
-        if level == 'info':
+        print("")
+        if level == 'INFO':
             logger.info(f"in {func_name}, file: {file_name}, string: {num} :: id: {user_id} :: {log_message}")
             await notify_main_adm(f'⚙ℹ `Info`\nin `{func_name}`, file: {file_name}, string: {num} :: id: `{user_id}` :: `{log_message}`', level)
-        if level == 'warning':
+        if level == 'WARNING':
             logger.warning(f"in {func_name}, file: {file_name}, string: {num} :: id: {user_id},  :: {log_message}")
             await notify_main_adm(f'⚙⚠ `Warning`\nin `{func_name}`, file: {file_name}, string: {num} :: id: `{user_id}` :: `{log_message}`', level)
-        if level == 'error':
+        if level == 'ERROR':
             logger.error(f"in {func_name}, file: {file_name}, string: {num} :: id: {user_id} :: {log_message}")
             await notify_main_adm(f'⚙🚫 `Error`\nin `{func_name}`, file: {file_name}, string: {num} :: id: `{user_id}` :: `{log_message}`', level)
     except Exception as error:

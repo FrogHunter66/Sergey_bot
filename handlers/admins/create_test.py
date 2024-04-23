@@ -68,7 +68,7 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     ev = await event.get_event(data.get("event_id"))
 
-    await query.message.answer(f"""🔓Напишите код, по которому будет осуществлен доступ к тестам вашего мероприятия, <b>код должен быть пятизначным числом</b>.
+    await query.message.answer(f"""🔓укажите код, по которому будет осуществлен доступ к тестам вашего мероприятия, <b>код должен быть пятизначным числом</b>.
 
 ⚡Текущий код доступа <code>{ev.password if ev.password else "⛔Пока не определен"}</code>""", reply_markup=ikb_back_actions_event(), parse_mode=ParseMode.HTML)
 
@@ -156,21 +156,21 @@ async def check_reuslts_admin(query: CallbackQuery, state: FSMContext):
         minuses = current.count("0")
         user = await users.get_current_user(result.id_user)
         name = user.first_name
-        username = "@" + user.username
+        username = "@" + user.username if name != None else None
         await query.message.answer(f"""📊Результат пользователя <b>{username if username else "Неопознанно"}</b>
 
 Имя <b>{name}</b>
 
 Тест <b>{current_test.name}</b>:
 
+🎯 Выполнение - {(pluses / len(current) * 100) // 1} %
+
 ✅ Правильных ответов - {pluses}
     
 ❌ Неправильных ответов - {minuses}
     
-🎯 Выполнение - {(pluses / len(current) * 100) // 1} %
     
-    
-#results""", parse_mode=ParseMode.HTML)
+#result""", parse_mode=ParseMode.HTML)
 
 
 @router.callback_query(F.data == "ikb_send", Current.event)

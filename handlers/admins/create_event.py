@@ -46,7 +46,7 @@ async def second(callback: types.CallbackQuery):
 async def second(callback: types.CallbackQuery, state: FSMContext):
     admin = await users.get_current_user(callback.from_user.id)
     if admin.c_events > 0:
-        await callback.message.answer(f"📝Напишите название мероприятия. Доступно <b>{admin.c_events}</b> мероприятий для создания", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
+        await callback.message.answer(f"📝укажите название мероприятия. Доступно <b>{admin.c_events}</b> мероприятий для создания", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
         await state.set_state(Creation.name_event)
     else:
         await callback.message.answer(f"⛔ У вас закончились доступные мероприятия", reply_markup=ikb_back())

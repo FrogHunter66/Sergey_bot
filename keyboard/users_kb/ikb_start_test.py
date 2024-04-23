@@ -6,6 +6,6 @@ from aiogram.utils.keyboard import InlineKeyboardButton
 
 def ikb_start_test():
     btn1 = InlineKeyboardButton(text="🟢Начать", callback_data="ikb_start_test")
-    btn2 = InlineKeyboardButton(text="↩️Назад", callback_data="ikb_back_code")
+    btn2 = InlineKeyboardButton(text="↩️Назад", callback_data="ikb_back_list_tests")
     builder = InlineKeyboardMarkup(inline_keyboard=[[btn1], [btn2]])
     return builder
