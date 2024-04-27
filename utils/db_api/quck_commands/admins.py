@@ -63,3 +63,14 @@ async def add_event(id_user, id_event):
     else:
         lst = [id_event]
         await admin.update(events=lst).apply()
+
+async def delete_event(id_event, id_user):
+    admin = await users.get_current_user(id_user)
+
+    ev = list(admin.events)
+    try:
+        ind = ev.index(id_event)
+        ev.pop(ind)
+        await admin.update(events=ev).apply()
+    except:
+        pass

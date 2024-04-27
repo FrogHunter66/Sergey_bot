@@ -1,3 +1,4 @@
+from utils.db_api.quck_commands import users, admins
 from utils.models import Event, db
 from loader import bot
 from asyncpg import UniqueViolationError
@@ -22,6 +23,9 @@ async def select_event(event_id):
     return event
 
 async def delete_event(event_id):
+    admins_lst = await users.get_all_admins()
+    for adm in admins_lst:
+        await admins.delete_event(event_id, adm.id)
     info = await Event.query.where(Event.id_event == event_id).gino.first()
     await info.delete()
 
