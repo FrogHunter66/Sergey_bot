@@ -23,7 +23,7 @@ async def select_event(event_id):
     return event
 
 async def delete_event(event_id):
-    admins_lst = await users.get_all_admins()
+    admins_lst = await users.get_admins_and_buy()
     for adm in admins_lst:
         await admins.delete_event(event_id, adm.id)
     info = await Event.query.where(Event.id_event == event_id).gino.first()

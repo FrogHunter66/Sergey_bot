@@ -15,6 +15,13 @@ async def get_all_admins():
            lst.append(user)
     return lst
 
+async def get_admins_and_buy():
+    lst = []
+    users = await User.query.gino.all()
+    for user in users:
+        if user.status == "admin" or user.status == "admin_buy":
+            lst.append(user)
+    return lst
 
 async def get_all_users():
     users = await User.query.gino.all()
