@@ -213,13 +213,14 @@ async def second(query: CallbackQuery, state: FSMContext):
     if variants:
         lst_vars = list(map(str, variants.split(".*.")))
         vars = "\n".join(f"{index}. {element}" for index, element in enumerate(lst_vars, start=1))
+        await query.message.answer("🎯Выберите ответ, который будет считаться правильным", reply_markup=ikb_back())
         response = f"""🎯Варианты ответа:
 {vars}"""
         await query.message.answer(response)
     else:
-        await query.message.answer("🚫Вы пока не ввели правильный вариант ответа")
+        await query.message.answer("🚫Вы пока не ввели правильный вариант ответа", reply_markup=ikb_back())
 
-    await query.message.answer("🎯Выберите ответ, который будет считаться правильным", reply_markup=ikb_back())
+
     await state.set_state(Current.rebuild_correct)
 
 
