@@ -33,4 +33,10 @@ router = Router()
 
 @router.callback_query(Current.event, F.data =="choose_quiz_from_db")
 async def dbs(query: CallbackQuery, state: FSMContext):
+    dbs_tests = await tests.get_all_tests()
+    data = await state.get_data()
+    current_ev_id = data.get("current_id")
+    for t in dbs_tests:
+        if t.id_event ==
+
     #TODO Остановился на том чтобы придумать интерфейс для меню выбора из бд теста
