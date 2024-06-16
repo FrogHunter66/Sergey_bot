@@ -2,7 +2,6 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from handlers import group_game
 from handlers.admins import create_event, utils, create_test, first, commands_for_tests, second, reuild_question, buy_admin
 from handlers.admins.users import register, passing_test
 from config import TELEGRAM_TOKEN
@@ -26,16 +25,12 @@ async def main():
     await create_tables()
     await set_commands(bot)
     try:
-
         logging.basicConfig(level=logging.INFO)
         storage = MemoryStorage()
-
         dp = Dispatcher(storage=storage)
         dp.include_routers(create_event.router, utils.router, create_test.router, first.router, commands_for_tests.router, second.router, reuild_question.router, buy_admin.router, register.router, passing_test.router)
-
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot)
-
     finally:
         await disconnect()
 
