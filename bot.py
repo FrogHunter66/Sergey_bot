@@ -4,6 +4,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from handlers.admins import create_event, utils, create_test, first, commands_for_tests, second, reuild_question, buy_admin
 from handlers.admins.users import register, passing_test
+from handlers.admins.users import dbs
 from config import TELEGRAM_TOKEN
 import logging
 from aiogram.types import BotCommand, BotCommandScopeDefault
@@ -28,7 +29,7 @@ async def main():
         logging.basicConfig(level=logging.INFO)
         storage = MemoryStorage()
         dp = Dispatcher(storage=storage)
-        dp.include_routers(create_event.router, utils.router, create_test.router, first.router, commands_for_tests.router, second.router, reuild_question.router, buy_admin.router, register.router, passing_test.router)
+        dp.include_routers(create_event.router, utils.router, create_test.router, first.router, commands_for_tests.router, second.router, reuild_question.router, buy_admin.router, register.router, passing_test.router, dbs.router)
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot)
     finally:

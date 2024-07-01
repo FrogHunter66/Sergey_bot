@@ -21,7 +21,7 @@ async def add_test(id_test:int, setting_passing:int, setting_time:str, id_event:
     else:
         end_time = datetime.datetime(2030, 1, 1, 0, 0, 0)
 
-    test = Test(id_test=id_test, lifetime=setting_time1, bound_time=setting_passing, id_event=id_event, end_time=end_time, name=name)
+    test = Test(id_test=id_test, lifetime=setting_time1, bound_time=setting_passing, id_event=[id_event], end_time=end_time, name=name)
     await test.create()
 
 
@@ -35,10 +35,11 @@ async def get_current(id_event, id_test):
 
 async def get_all_tests_in_event(id):
     lst = list()
-    events = await get_all_tests()
-    for i, event in enumerate(events):
-        if event.id_event == id:
-            lst.append(event)
+    tests = await get_all_tests()
+    for i, test in enumerate(tests):
+        if test.id_event:
+            if id in test.id_event:
+                lst.append(test)
     return lst
 
 
@@ -87,3 +88,27 @@ async def decrement_tests(id_user):
     ev = int(user.c_tests)
     await user.update(c_tests=ev - 1).apply()
 
+
+async def add_event_test(event_id, id_test):
+    test = await get_current(id_test=id_test, id_event=1)
+    try:
+        if test.id_event:
+            current_events_test = list(test.id_event)
+            current_events_test.append(int(event_id))
+            await test.update(id_event=current_events_test).apply()
+        else:
+            await test.update(id_event=[event_id]).apply()
+    except Exception as err:
+        print("ERR", err)
+
+
+
+async def delete_event_test(event_id, id_test):
+    test = await get_current(id_test=id_test, id_event=1)
+    try:
+        current_events_test = list(test.id_event)
+        ind = current_events_test.index(event_id)
+        current_events_test.pop(ind)
+    except:
+        current_events_test = list(test.id_event)
+    await test.update(id_event=current_events_test).apply()

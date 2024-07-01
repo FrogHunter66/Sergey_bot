@@ -342,6 +342,15 @@ async def question(message: Message, state:FSMContext):
         print(err)
         await message.answer(f"☑️Выберите вариант ответа от 1 до {len(vars)}", reply_markup=ikb_back())
 
+def get_uniq_key(quests):
+    keys = list()
+    for q in quests:
+        keys.append(q.id_quest)
+    for i in range(100000):
+        if i not in keys:
+            return i
+    return 100000+1
+
 
 @router.callback_query(Current2.event, F.data =="ikb_add_question_test")
 async def second(query: CallbackQuery, state: FSMContext):
@@ -352,9 +361,10 @@ async def second(query: CallbackQuery, state: FSMContext):
     test_id = data.get("current_test")
     types = data.get("type")
     all_quests = await questions.get_all_quest()
+    id_key = get_uniq_key(all_quests)
     if quest and vars and correct:
         try:
-            await questions.add_test(id_test=test_id, id_quest=len(all_quests)+1, correct_answer=correct, quest_type=types, variants=vars, text=quest)
+            await questions.add_test(id_test=test_id, id_quest=id_key, correct_answer=correct, quest_type=types, variants=vars, text=quest)
             await query.message.answer("✅Вопрос успешно добавлен")
             kb = await ikb_all_questions(test_id)
             await query.message.answer("⚡Выберите действие для вопросов⚡", reply_markup=kb)

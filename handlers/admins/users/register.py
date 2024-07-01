@@ -88,12 +88,9 @@ async def take_quest(query: CallbackQuery, callback_data: Current_lks):
         for result in users_result:
             current_test = await tests.get_current(id_test=result.id_test, id_event=0)
             name = current_test.name
-            ev = await event.get_event(id=current_test.id_event)
             pluses = (result.result).count('1')
             minuses = (result.result).count('0')
-            await query.message.answer(f"""Мероприятие: <b>{ev.event_name}</b>
-
-📋Тест: <b>{name}</b>
+            await query.message.answer(f"""📋Тест: <b>{name}</b>
             
 🎯 Процент выполнения - <b>{round(pluses/(pluses+minuses), 2) * 100} %</b>
     
@@ -116,7 +113,6 @@ async def start_test(message: Message, state: FSMContext):
     all_events = await event.get_all_events()
     flag = False
     for ev in all_events:
-        # print("code - ", code, "event pass - ", ev.password, code == ev.password, type(code), type(ev.password))
         if ev.password == int(code):
             current_ev = ev
             await state.update_data(current_event=ev.id_event)

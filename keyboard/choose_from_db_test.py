@@ -6,40 +6,28 @@ from utils.db_api.quck_commands import tests
 from aiogram.filters.callback_data import CallbackData
 
 
-class answer(CallbackData, prefix="my"):
+class test_from_db(CallbackData, prefix="my"):
     cb: str
     id: int
 
 
 
-async def ikb_pass_test(id_event):
-    evnts_test = await tests.get_all_tests_in_event(id_event)
+async def ikb_test_from_db(id_event):
     all_tests = await tests.get_all_tests()
-    for
-
-
-
-    variants = list(map(str, all_variants.split(".*.")))
-    lst = list()
-    for i, var in enumerate(variants):
-        cb = answer(cb="ikb_answer", id=i + 1).pack()
-        if mark:
-            lst_mark = [m for m in mark]
-            if str(i+1) in lst_mark:
-                btn1 = InlineKeyboardButton(text=f"{i + 1}-й ответ ✔",
-                                            callback_data=cb)
-                lst.append(btn1)
+    lst_buttons = list()
+    for i, test in enumerate(all_tests):
+        id_events = test.id_event
+        cb = test_from_db(cb="ikb_test_from_db", id=test.id_test).pack()
+        if id_events:
+            if id_event in id_events:
+                btn = InlineKeyboardButton(text=f"✔ {test.name}", callback_data=cb)
             else:
-                btn1 = InlineKeyboardButton(text=f"{i + 1}-й ответ",
-                                            callback_data=cb)
-                lst.append(btn1)
-
+                btn = InlineKeyboardButton(text=f"{test.name}", callback_data=cb)
         else:
-            btn1 = InlineKeyboardButton(text=f"{i+1}-й ответ",
-                                        callback_data=cb)
-            lst.append(btn1)
-    btn3 = (InlineKeyboardButton(text="💾Сохранить ответ", callback_data=f"ikb_save_answer"))
-    ss = [[m] for m in lst]
+            btn = InlineKeyboardButton(text=f"{test.name}", callback_data=cb)
+        lst_buttons.append(btn)
+    btn3 = (InlineKeyboardButton(text="💾Сохранить", callback_data=f"ikb_save_answer_dbs"))
+    ss = [[m] for m in lst_buttons]
     ss.append([btn3])
     builder = InlineKeyboardMarkup(inline_keyboard=ss)
     return builder
