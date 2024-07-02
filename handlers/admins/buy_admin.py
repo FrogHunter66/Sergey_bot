@@ -6,6 +6,9 @@ from aiogram.types import Message, InlineKeyboardButton, CallbackQuery
 from aiogram import types
 from aiogram.filters import Command
 
+from filters.Old_User import Old_user
+from filters.is_new_user import New_User
+from keyboard.users_kb.ikb_start import ikb_start
 from loader import bot
 from keyboard.inline_main_menu import ikb_main_menu
 from keyboard.ikb_back import ikb_back
@@ -35,7 +38,7 @@ PRICE9 = types.LabeledPrice(label="💎 100 мероприятий, 20 тест�
 PRICE10 = types.LabeledPrice(label="👑 Безлимит - 28000", amount=28000*100)  # в копейках (руб)
 prices = list([PRICE1, PRICE2, PRICE3, PRICE4, PRICE5, PRICE6, PRICE7, PRICE8, PRICE9, PRICE10])
 
-@router.message(Command("buy"))
+@router.message(Command("buy"), Old_user())
 async def first(message: Message):
     await message.answer("""👋Приветствую дорогой пользователь, предлагаю вам приобрести возможность создавать тесты и мероприятия
     
@@ -57,6 +60,11 @@ async def first(message: Message):
 💎 100 мероприятий, 20 тестов - 12000 рублей (пакет 8)
 👑 Безлимит - 28000 
 """, reply_markup=ikb_buy_admin(), parse_mode=ParseMode.HTML)
+
+
+@router.message(Command("buy"), New_User())
+async def first(message: Message):
+    await message.answer("❌ Перед покупкой роли администратора, необходимо зарегестрироваться", reply_markup=ikb_start())
 
 
 @router.callback_query(Choose_price.filter(F.cb=="ikb_buy"))
