@@ -9,3 +9,10 @@ def ikb_adding_questions():
     btn3 = InlineKeyboardButton(text="↩️Назад", callback_data="back_to_rebuild_test")
     builder = InlineKeyboardMarkup(inline_keyboard=[[btn1], [btn3]])
     return builder
+
+
+def ikb_adding_quiz_quest():
+    btn1 = InlineKeyboardButton(text="➕Создать вопрос",callback_data="create_quizz_quest")
+    btn3 = InlineKeyboardButton(text="↩️Назад", callback_data="back_to_rebuild_quest")
+    builder = InlineKeyboardMarkup(inline_keyboard=[[btn1], [btn3]])
+    return builder

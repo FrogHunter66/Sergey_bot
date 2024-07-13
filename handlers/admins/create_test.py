@@ -241,7 +241,7 @@ async def add_test(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await query.message.answer(f"""Количество оставшихся тестов: *{user.c_tests}*
 
-🛠️Выберите настройки опроса:""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
+🛠️Выберите настройки теста:""", reply_markup=ikb_settings_test(), parse_mode=ParseMode.MARKDOWN_V2)
 
 @router.callback_query(Current.event, F.data == "ikb_name_for_test")
 async def add_test2(query: CallbackQuery, state: FSMContext):

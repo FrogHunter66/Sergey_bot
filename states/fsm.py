@@ -23,6 +23,12 @@ class Current(StatesGroup):
     setting_passing = State()
     setting_time = State()
 
+    setting_name_quizz = State()
+    setting_passing_quizz = State()
+    setting_time_quizz = State()
+
+
+
     setting_code2 = State()
     setting_passing2 = State()
     setting_name2 = State()

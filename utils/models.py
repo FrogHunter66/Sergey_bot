@@ -28,6 +28,17 @@ class Event(BaseModel):
     password = db.Column(db.BigInteger)
 
 
+class Quiz(BaseModel):
+    __tablename__ = 'test'
+    quiz_id = db.Column(db.BigInteger, primary_key=True, nullable=False)
+    event_id = db.Column(db.ARRAY(db.BigInteger))
+    lifetime = db.Column(db.String)
+    end_time = db.Column(db.DateTime(timezone=True))
+    bound_time = db.Column(db.BigInteger)
+    name = db.Column(db.String)
+    notifications = db.Column(db.ARRAY(db.BigInteger))
+
+
 class Test(BaseModel):
     __tablename__ = 'test'
     id_test = db.Column(db.BigInteger, primary_key=True, nullable=False)

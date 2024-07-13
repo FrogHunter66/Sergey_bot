@@ -1,8 +1,6 @@
-from aiogram.enums import ParseMode, ContentType
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.enums import ParseMode
 from aiogram import Router, F
-from aiogram.enums.dice_emoji import DiceEmoji
-from aiogram.types import Message, InlineKeyboardButton, CallbackQuery
+from aiogram.types import Message, CallbackQuery
 from aiogram import types
 from aiogram.filters import Command
 
@@ -10,16 +8,9 @@ from filters.Old_User import Old_user
 from filters.is_new_user import New_User
 from keyboard.users_kb.ikb_start import ikb_start
 from loader import bot
-from keyboard.inline_main_menu import ikb_main_menu
-from keyboard.ikb_back import ikb_back
-from keyboard.save_event import ikb_save
-from keyboard.ikb_all_events import ikb_all_events, Choose_event
-from filters.is_admin import Admin
 from set_logs1.logger_all1 import log_exceptions1
 from utils.db_api.quck_commands import event, admins
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
-from states.fsm import Creation
 from keyboard.ikb_buy_admin import ikb_buy_admin, Choose_price
 import config
 
@@ -41,7 +32,7 @@ prices = list([PRICE1, PRICE2, PRICE3, PRICE4, PRICE5, PRICE6, PRICE7, PRICE8, P
 @router.message(Command("buy"), Old_user())
 async def first(message: Message):
     await message.answer("""👋Приветствую дорогой пользователь, предлагаю вам приобрести возможность создавать тесты и мероприятия
-    
+
 🛒Прайс лист:
 
 Пакеты на месяц - 

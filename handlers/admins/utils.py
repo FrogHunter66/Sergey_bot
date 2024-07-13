@@ -441,7 +441,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
     num = data_state.get("current_test")
     name = data_state.get("event")
-    await callback.message.answer("""⚙️Выберите настройки опроса:
+    await callback.message.answer("""⚙️Выберите настройки теста:
 📝Название теста 
 🕒Время на выполнение теста
 🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
@@ -453,7 +453,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
     num = data_state.get("current_test")
     name = data_state.get("event")
-    await callback.message.answer("""⚙️Выберите настройки опроса:
+    await callback.message.answer("""⚙️Выберите настройки теста:
 📝Название теста
 🕒Время на выполнение теста
 🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())
@@ -465,7 +465,7 @@ async def second(callback: types.CallbackQuery, state: FSMContext):
     data_state = await state.get_data()
     num = data_state.get("current_test")
     name = data_state.get("event")
-    await callback.message.answer("""⚙️Выберите настройки опроса:
+    await callback.message.answer("""⚙️Выберите настройки теста:
 📝Название теста
 🕒Время на выполнение теста
 🕒Время через которое тест перестанет быть действительным""", reply_markup=ikb_settings_test())

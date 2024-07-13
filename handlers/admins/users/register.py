@@ -1,34 +1,16 @@
 import pickle
-
 from aiogram.enums import ParseMode
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router, F
 from aiogram.enums.dice_emoji import DiceEmoji
-from aiogram.types import Message, InlineKeyboardButton, CallbackQuery
-from aiogram import types
+from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 import datetime
-from keyboard.ikb_actions_question import ikb_actions_qustion, ikb_actions_rebuild_qustion
-from keyboard.inline_main_menu import ikb_main_menu
-from keyboard.ikb_back import ikb_back
-from keyboard.save_event import ikb_save
-from keyboard.ikb_all_events import ikb_all_events
-from filters.is_admin import Admin
 from filters.is_new_user import New_User
 from filters.Old_User import Old_user
 from utils.db_api.quck_commands import event
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
-from states.fsm import Creation, Current, Current2, User
-from keyboard.list_tests import ikb_all_tests, Choose_test
-from keyboard.ikb_current_test import ikb_current_test
+from states.fsm import User
 from keyboard.users_kb.ikb_get_all_tests import pick_a_test_user, ikb_all_tests_event_user
-from keyboard.ikb_settings_test import ikb_settings_test
-from keyboard.ikb_timer import ikb_timer, Choose_timeer
-from keyboard.ikb_adding_questions import ikb_adding_questions
-from keyboard.ikb_types_questions import ikb_types_of_questions
-from keyboard.ikb_rebuilding_test import ikb_rebuild
-from keyboard.list_questions import ikb_all_questions, Choose_quest
 from keyboard.users_kb.ikb_start import ikb_start
 from utils.db_api.quck_commands import tests, questions
 from keyboard.users_kb.ikb_start_test import ikb_start_test

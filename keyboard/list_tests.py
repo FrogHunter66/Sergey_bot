@@ -1,7 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardButton
-from utils.db_api.quck_commands import tests
+from utils.db_api.quck_commands import tests, quiz
 from aiogram.filters.callback_data import CallbackData
 
 
@@ -21,6 +21,25 @@ async def ikb_all_tests(id):
         btn1 = InlineKeyboardButton(text=f"{current.name}", callback_data=cb)
         lst.append(btn1)
     btn3 = (InlineKeyboardButton(text="↩️Назад", callback_data=f"ikb_back_tochoose_opros"))
+    lst1 = [[m] for m in lst]
+    builder = InlineKeyboardMarkup(inline_keyboard=[*lst1, [btn3]])
+    return builder
+
+
+class Choose_quiz(CallbackData, prefix="my"):
+    cb: str
+    id: int
+
+
+async def ikb_all_quiz(id):
+    events = await quiz.get_all_tests_in_event(id)
+    lst = list()
+    for i, event in enumerate(events):
+        cb = Choose_test(cb="ikb_quizes", id=event.id_quiz).pack()
+        current = await tests.get_current(1, id_test=event.id_quiz)
+        btn1 = InlineKeyboardButton(text=f"{current.name}", callback_data=cb)
+        lst.append(btn1)
+    btn3 = (InlineKeyboardButton(text="↩️Назад", callback_data=f"ikb_back_tochoose_quiz"))
     lst1 = [[m] for m in lst]
     builder = InlineKeyboardMarkup(inline_keyboard=[*lst1, [btn3]])
     return builder
