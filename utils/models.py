@@ -29,7 +29,7 @@ class Event(BaseModel):
 
 
 class Quiz(BaseModel):
-    __tablename__ = 'test'
+    __tablename__ = 'quiz'
     quiz_id = db.Column(db.BigInteger, primary_key=True, nullable=False)
     event_id = db.Column(db.ARRAY(db.BigInteger))
     lifetime = db.Column(db.String)
@@ -72,6 +72,7 @@ class User(BaseModel):
     data_end = db.Column(db.DateTime(timezone=True))
     c_events = db.Column(db.BigInteger)
     c_tests = db.Column(db.BigInteger)
+    c_quizes = db.Column(db.BigInteger)
 
 
 

@@ -27,18 +27,22 @@ async def successful_pay(message: Message, package:list):
         return True
     try:
         if user.data_end:
-            end_time = (user.data_end + datetime.timedelta(days=package[3]*31)).replace(microsecond=0)
+            end_time = (user.data_end + datetime.timedelta(days=package[4]*31)).replace(microsecond=0)
             await user.update(data_end=end_time).apply()
             events = user.c_events
             tests = user.c_tests
+            quizes = user.c_quizes
             await user.update(c_events=package[0] + events).apply()
             await user.update(c_tests=package[1] + tests).apply()
+            await user.update(c_quizes=package[2] + quizes).apply()
         else:
-            current = datetime.datetime.utcnow() + datetime.timedelta(days=package[3]*31, hours=3)
+            current = datetime.datetime.utcnow() + datetime.timedelta(days=package[4]*31, hours=3)
             current = current.replace(tzinfo=datetime.timezone.utc, microsecond=0)
             await user.update(data_end=current).apply()
             await user.update(c_events=package[0]).apply()
             await user.update(c_tests=package[1]).apply()
+            await user.update(c_quizes=package[2]).apply()
+
         if user.status == "user":
             await user.update(status="admin_buy").apply()
         return True

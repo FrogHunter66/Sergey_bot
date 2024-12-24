@@ -21,7 +21,7 @@ async def add_test(id_test:int, setting_passing:int, setting_time:str, id_event:
     else:
         end_time = datetime.datetime(2030, 1, 1, 0, 0, 0)
 
-    test = Quiz(id_test=id_test, lifetime=setting_time1, bound_time=setting_passing, id_event=[id_event], end_time=end_time, name=name)
+    test = Quiz(quiz_id=id_test, lifetime=setting_time1, bound_time=setting_passing, event_id=[id_event], end_time=end_time, name=name)
     await test.create()
 
 
@@ -45,6 +45,7 @@ async def get_all_tests_in_event(id):
 
 async def get_all_tests():
     events = await Quiz.query.gino.all()
+
     return events
 
 

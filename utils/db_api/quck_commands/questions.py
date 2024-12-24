@@ -17,7 +17,7 @@ async def add_test(id_quest:int, id_test:int, quest_type:int, variants, correct_
         elif type(correct_answer) == list:
             correct_answer = ".*.".join(correct_answer)
         else:
-            pass
+            correct_answer = None
 
         test = Questions(id_quest=id_quest, id_test=id_test, type=quest_type, variants=variants, correct_answer=correct_answer, text=text)
         await test.create()

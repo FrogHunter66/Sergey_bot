@@ -31,10 +31,12 @@ async def second(callback: types.CallbackQuery):
     admin = await users.get_current_user(callback.from_user.id)
     ev = admin.c_events
     tests = admin.c_tests
+    quizes = admin.c_quizes
     date = (admin.data_end).strftime('%Y-%m-%d')
     await callback.message.answer(f"""ℹ️Остатки по пакету - 
 🌟Мероприятий осталось - <b>{ev}</b>
 🌟Тестов осталось - <b>{tests}</b>
+🌟Опросов осталось - <b>{quizes}</b>
 ⏳Время действия тарифа до - <b>{date}</b>
 
 Для продления подписки вы можете оплатить новый пакет с помощью команды /buy""", parse_mode=ParseMode.HTML, reply_markup=ikb_back())

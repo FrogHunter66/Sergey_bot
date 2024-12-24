@@ -14,7 +14,7 @@ from keyboard.ikb_all_events import ikb_all_events
 from filters.is_admin import Admin
 from set_logs1.logger_all1 import log_exceptions1
 
-from utils.db_api.quck_commands import event
+from utils.db_api.quck_commands import event, quiz
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from states.fsm import Creation, Current
@@ -336,26 +336,33 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
     test_name = data.get("setting_name")
 
     if passing and time and test_name:
-        try:
-            all_test = await tests.get_all_tests()
-            values = list()
+        values = list()
+        all_quizes = await quiz.get_all_tests()
+        all_test = await tests.get_all_tests()
+        if all_test:
             for t in all_test:
                 values.append(int(t.id_test))
+        if all_quizes:
+            for t in all_quizes:
+                values.append(int(t.quiz_id))
+        if not values:
+            id_test = 1
+        else:
             id_test = await get_unique_key(values)
-            await state.update_data(current_test=id_test)
-            await tests.add_test(id_event=id, setting_time=time, setting_passing=passing, id_test=id_test, name=test_name)
+        await state.update_data(current_test=id_test)
+        await tests.add_test(id_event=id, setting_time=time, setting_passing=passing, id_test=id_test, name=test_name)
 
-            await tests.decrement_tests(query.from_user.id)
+        await tests.decrement_tests(query.from_user.id)
 
-            user = await users.get_current_user(query.from_user.id)
-            await query.message.answer(f"✔️Тест успешно создан. Количество оставшихся тестов: <b>{user.c_tests}</b>", parse_mode=ParseMode.HTML)
-            await query.message.answer("❔Можете приступить к заполнению вопросами", reply_markup=ikb_adding_questions())
-            await state.update_data(setting_passing="")
-            await state.update_data(setting_time="")
-            await state.update_data(setting_name="")
-        except Exception as err:
-            await query.message.answer("❌При создании теста возникла ошибка", reply_markup=ikb_back())
-            await log_exceptions1("create_test_final", "ERROR", "create_test.py", 339, err, query.from_user.id)
+        user = await users.get_current_user(query.from_user.id)
+        await query.message.answer(f"✔️Тест успешно создан. Количество оставшихся тестов: <b>{user.c_tests}</b>", parse_mode=ParseMode.HTML)
+        await query.message.answer("❔Можете приступить к заполнению вопросами", reply_markup=ikb_adding_questions())
+        await state.update_data(setting_passing="")
+        await state.update_data(setting_time="")
+        await state.update_data(setting_name="")
+        # except Exception as err:
+        #     await query.message.answer("❌При создании теста возникла ошибка", reply_markup=ikb_back())
+        #     await log_exceptions1("create_test_final", "ERROR", "create_test.py", 339, err, query.from_user.id)
     else:
         await query.message.answer(f"""📝Название теста: <b>{test_name if test_name else "⛔Пока не определено"}</b> 
 🕘Время на выполнение теста: <b>{str(time) + " минут" if time else "⛔Пока не определено"}</b>

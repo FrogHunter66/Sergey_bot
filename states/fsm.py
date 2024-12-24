@@ -38,10 +38,15 @@ class Current(StatesGroup):
     question = State()
     variants_new = State()
     variants_del = State()
+
+
+    question_quiz = State()
+    variants_new_quiz = State()
+    variants_del_quiz = State()
+
     correct = State()
 
-
-
+    variants_quiz = State()
     rebuild_quest = State()
     rebuild_type = State()
     rebuild_question = State()
@@ -66,8 +71,13 @@ class Current2(StatesGroup):
     type = State()
     question = State()
     variants = State()
+    variants_quiz = State()
     variants_new = State()
     variants_del = State()
+    question_quiz = State()
+    variants_new_quiz = State()
+    variants_del_quiz = State()
+
     correct = State()
     volume_vars = State()
     num_of_correct = State()

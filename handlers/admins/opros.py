@@ -9,7 +9,7 @@ from filters.is_admin import Admin
 from keyboard.list_questions import ikb_all_questions
 from keyboard.list_tests import ikb_all_tests
 from set_logs1.logger_all1 import log_exceptions1
-from utils.db_api.quck_commands import event, tests, questions, users
+from utils.db_api.quck_commands import event, tests, questions, users, quiz
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from states.fsm import Creation, Current
@@ -23,7 +23,7 @@ from keyboard.ikb_all_events import ikb_all_events, Choose_event
 from keyboard.ikb_current_test import ikb_current_test
 from keyboard.ikb_settings_test import ikb_settings_test, ikb_settings_quiz
 from keyboard.ikb_adding_questions import ikb_adding_questions, ikb_adding_quiz_quest
-from keyboard.ikb_types_questions import ikb_types_of_questions
+from keyboard.ikb_types_questions import ikb_types_of_questions, ikb_types_of_questions_quiz
 from keyboard.ikb_actions_question import ikb_actions_qustion
 from keyboard.ikb_change_variants_question import ikb_change_variants_question
 router = Router()
@@ -50,13 +50,13 @@ async def second(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await query.message.answer(f"""Количество оставшихся опросов: *{user.c_tests}*
 
-    🛠️Выберите настройки опроса:""", reply_markup=ikb_settings_quiz(), parse_mode=ParseMode.MARKDOWN_V2)
+🛠️Выберите настройки опроса:""", reply_markup=ikb_settings_quiz(), parse_mode=ParseMode.MARKDOWN_V2)
 
 
 
 @router.callback_query(Current.event, F.data == "ikb_name_for_quizz")
 async def add_test2(query: CallbackQuery, state: FSMContext):
-    await state.set_state(Current.setting_name)
+    await state.set_state(Current.setting_name_quizz)
     await query.message.answer("📝Укажите имя опроса, *имя может содержать любые символы*", reply_markup=ikb_back(), parse_mode=ParseMode.MARKDOWN_V2)
 
 
@@ -146,26 +146,38 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
     test_name = data.get("setting_name_quizz")
 
     if passing and time and test_name:
-        try:
-            all_test = await tests.get_all_tests()
-            values = list()
+        values = list()
+
+        all_quizes = await quiz.get_all_tests()
+        all_test = await tests.get_all_tests()
+
+        if all_test:
+
             for t in all_test:
                 values.append(int(t.id_test))
+        if all_quizes:
+            for t in all_quizes:
+                values.append(int(t.quiz_id))
+        if not values:
+            id_test = 1
+        else:
             id_test = await get_unique_key(values)
-            await state.update_data(current_test=id_test)
-            await tests.add_test(id_event=id, setting_time=time, setting_passing=passing, id_test=id_test, name=test_name)
+            print("TESTS ARENT FOUND")
+        await state.update_data(current_test=id_test)
+        print(id, time, passing, id_test, test_name)
+        await quiz.add_test(id_event=id, setting_time=time, setting_passing=passing, id_test=id_test, name=test_name)
 
-            await tests.decrement_tests(query.from_user.id)
+        await quiz.decrement_tests(query.from_user.id)
 
-            user = await users.get_current_user(query.from_user.id)
-            await query.message.answer(f"✔Опрос успешно создан. Количество оставшихся тестов: <b>{user.c_tests}</b>", parse_mode=ParseMode.HTML)
-            await query.message.answer("❔Можете приступить к заполнению вопросами", reply_markup=ikb_adding_quiz_quest())
-            await state.update_data(setting_passing_quizz="")
-            await state.update_data(setting_time_quizz="")
-            await state.update_data(setting_name_quizz="")
-        except Exception as err:
-            await query.message.answer("❌При создании опроса возникла ошибка", reply_markup=ikb_back())
-            await log_exceptions1("create_test_final", "ERROR", "create_test.py", 339, err, query.from_user.id)
+        user = await users.get_current_user(query.from_user.id)
+        await query.message.answer(f"✔Опрос успешно создан. Количество оставшихся тестов: <b>{user.c_tests}</b>", parse_mode=ParseMode.HTML)
+        await query.message.answer("❔Можете приступить к заполнению вопросами", reply_markup=ikb_adding_quiz_quest())
+        await state.update_data(setting_passing_quizz="")
+        await state.update_data(setting_time_quizz="")
+        await state.update_data(setting_name_quizz="")
+        # except Exception as err:
+        #     await query.message.answer("❌При создании опроса возникла ошибка", reply_markup=ikb_back())
+        #     await log_exceptions1("add_test2", "ERROR", "opros.py", 168, err, query.from_user.id)
     else:
         await query.message.answer(f"""📝Название опроса: <b>{test_name if test_name else "⛔Пока не определено"}</b> 
 🕘Время на выполнение опроса: <b>{str(time) + " минут" if time else "⛔Пока не определено"}</b>
@@ -179,7 +191,7 @@ async def add_test2(query: CallbackQuery, state: FSMContext):
 async def add_test2(query: CallbackQuery, state: FSMContext):
     await query.message.answer("""✏️Выберите тип вопроса:
 1️⃣1 тип \- вопрос с единственным выбором
-🔢2 тип \- вопрос с множественным выбором""", reply_markup=ikb_types_of_questions(), parse_mode=ParseMode.MARKDOWN_V2)
+🔢2 тип \- вопрос с множественным выбором""", reply_markup=ikb_types_of_questions_quiz(), parse_mode=ParseMode.MARKDOWN_V2)
 
 
 @router.callback_query(Current.event, F.data == "C")

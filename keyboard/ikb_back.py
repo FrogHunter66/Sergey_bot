@@ -14,6 +14,10 @@ def ikb_back():
     builder = InlineKeyboardMarkup(inline_keyboard=[[btn1]])
     return builder
 
+def ikb_back_quiz():
+    btn1 = InlineKeyboardButton(text="↩️Назад", callback_data="ikb_back_quiz")
+    builder = InlineKeyboardMarkup(inline_keyboard=[[btn1]])
+    return builder
 
 def ikb_back_create_test():
     btn1 = InlineKeyboardButton(text="↩️Назад", callback_data="ikb_back")
