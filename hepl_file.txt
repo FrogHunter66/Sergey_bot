@@ -1,0 +1,98 @@
+await state.update_data(current_test="")
+    await state.update_data(setting_code="")
+    await state.update_data(setting_passing="")
+    await state.update_data(setting_time="")
+    await state.update_data(setting_code2="")
+    await state.update_data(setting_passing2="")
+    await state.update_data(setting_time2="")
+    await state.update_data(variants="")
+    await state.update_data(question="")
+    await state.update_data(type="")
+
+
+🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
+
+#@router.message(Current.setting_code2, Admin())
+# async def add_test3(message: Message, state: FSMContext):
+#     code = message.text
+#     data = await state.get_data()
+#     id_ev = data.get("event_id")
+#     test_id = data.get("current_test")
+#     try:
+#         code = int(code)
+#         if code > 0:
+#             is_unique = True
+#             data_tests = await tests.get_all_tests()
+#             for test in data_tests:
+#                 print(test.token)
+#                 if test.token == code:
+#                     is_unique = False
+#                     break
+#             if is_unique:
+#                 code = int(code)
+#                 print(test_id)
+#                 await tests.update_code(id_event=id_ev, id_test=test_id, new_code=code)
+#                 await message.answer(f"✅Код доступа к тесту успешно установлен {code}", parse_mode=ParseMode.MARKDOWN_V2)
+#                 await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
+# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
+# 🕒*Время на прохождение* теста
+# 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
+#             else:
+#                 await message.answer("❌Данный код доступа *уже используется в другом тесте*, напишите другой код", parse_mode=ParseMode.MARKDOWN_V2)
+#                 await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
+# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
+# 🕒*Время на прохождение* теста
+# 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
+#         else:
+#             await message.answer("🔓Код доступа должен быть *натуральным числом*", parse_mode=ParseMode.MARKDOWN_V2)
+#             await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
+# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
+# 🕒*Время на прохождение* теста
+# 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2)
+#         await state.set_state(Current.current_test)
+#     except:
+#         await state.set_state(Current.current_test)
+#         await message.answer("🔓Код доступа может быть *только численнного формата*", parse_mode=ParseMode.MARKDOWN_V2)
+#         await message.answer("""📝*Имя теста* в котором вы можете отразить тему теста
+# 🔓*Код доступа* по которому пользователи смогут получить доступ к тесту
+# 🕒*Время на прохождение* теста
+# 🕒*Время существования* теста""", reply_markup=ikb_rebuild(), parse_mode=ParseMode.MARKDOWN_V2
+# )
+
+# @router.callback_query(Current.current_test, F.data == "access_code")
+# async def add_test2(query: CallbackQuery, state: FSMContext):
+#     await state.set_state(Current.setting_code2)
+#     data = await state.get_data()
+#     id_ev = data.get("event_id")
+#     id_test = data.get("current_test")
+#     test = await tests.get_current(id_test=id_test, id_event=id_ev)
+#     current_code = test.token
+#     await query.message.answer(f"""🔓Напишите код по которому будет осуществлен доступ к тесту
+# <b>Текущий код</b> {current_code}""", reply_markup=ikb_back(), parse_mode=ParseMode.HTML)
+#
+
+
+ВЗЯТО ИЗ ПОДСЧЕТА ПРАВИЛЬНЫХ И НЕ ПРАВИЛЬНЫХ ОТВЕТОВ ДЛЯ ВОПРОСА 2-ГО ТИПА:
+
+            for cor in correct:
+                nums.append(str(variants.index(cor) + 1))
+            try:
+                user_answers = test_result.get(quest.id_quest)
+                user_answers = [m for m in user_answers]
+                flag = True
+
+                for answer in user_answers:
+                    if answer not in nums:
+                        flag = False
+                        lst_res.append(0)
+                        result_minuses += 1
+                        break
+                if flag:
+                    lst_res.append(1)
+                    result_pluses += 1
+                else:
+                    lst_res.append(0)
+                    result_minuses += 1
+            except:
+                lst_res.append(0)
+                result_minuses += 1

@@ -6,6 +6,10 @@ from utils.models import db
 from config import POSTGRES_URI
 
 async def connect():
+    """
+    Старт движка базы данных
+    :return:
+    """
     engine = create_engine(POSTGRES_URI)
     db.bind = engine
     if db.bind is None:

@@ -20,6 +20,28 @@ class BaseModel(db.Model):
         values_str = ' '.join(f'{name}={value!r}' for name, value in values.items())
         return f'<{model} {values_str}>'
 
+
+
+
+async def create_tables():
+    await db.set_bind(POSTGRES_URI)
+    await db.gino.create_all()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class Event(BaseModel):
     __tablename__ = 'event'
 
@@ -83,7 +105,3 @@ class Results(BaseModel):
     id_user = db.Column(db.BigInteger)
     result = db.Column(db.String)
 
-
-async def create_tables():
-    await db.set_bind(POSTGRES_URI)
-    await db.gino.create_all()

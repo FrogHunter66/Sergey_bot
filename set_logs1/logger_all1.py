@@ -4,6 +4,16 @@ from loader import dp
 
 
 async def log_exceptions1(func_name, level, file_name="", num=0, log_message='', user_id=''):
+    """
+    Вывод всех видов логов
+    :param func_name:
+    :param level:
+    :param file_name:
+    :param num:
+    :param log_message:
+    :param user_id:
+    :return:
+    """
     try:
         print("")
         if level == 'INFO':

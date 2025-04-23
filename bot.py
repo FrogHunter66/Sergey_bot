@@ -14,6 +14,12 @@ from utils.db_api.quck_commands.event import add_event
 bot = Bot(token=TELEGRAM_TOKEN)
 
 async def set_commands(bot: Bot):
+    """
+    Функция для установки начальных команд в инлайн меню
+
+    :param bot: bot
+    :return: bot.set_my_Commands
+    """
     commands = [
         BotCommand(
             command='start', description='Начало работы'
@@ -23,6 +29,11 @@ async def set_commands(bot: Bot):
     await bot.set_my_commands(commands, BotCommandScopeDefault())
 
 async def main():
+    """
+    Функция для старта бота и подключение всех обработчиков команд бота
+
+    :return: disconnect()
+    """
     await create_tables()
     await set_commands(bot)
     try:

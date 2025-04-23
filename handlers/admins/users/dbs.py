@@ -18,6 +18,12 @@ Picked_tests = dict()
 
 @router.callback_query(Current.event, F.data =="choose_quiz_from_db")
 async def dbs(query: CallbackQuery, state: FSMContext):
+    """
+    Выбор теста из базы данных
+    :param query:
+    :param state:
+    :return:
+    """
     data = await state.get_data()
     current_ev_id = data.get("event_id")
     ev = await event.get_event(current_ev_id)

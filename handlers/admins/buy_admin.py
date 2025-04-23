@@ -77,6 +77,11 @@ async def pre_checkout_query(pre_checkout_q: types.PreCheckoutQuery):
 # successful payment
 @router.message(F.successful_payment)
 async def successful_payment(message:Message):
+    """
+    Успешная покупка роли
+    :param message:
+    :return:
+    """
     print("SUCCESSFUL PAYMENT")
     payment_info = message.successful_payment
     print("INFO - ", packages[int(payment_info.invoice_payload)])
